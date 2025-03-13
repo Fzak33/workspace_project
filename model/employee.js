@@ -12,11 +12,13 @@ const employeeSchema =  new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim:true
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        trim:true
     },
    
     department: {
@@ -31,6 +33,10 @@ const employeeSchema =  new Schema({
         type: String,
         required: true
     },
+   status: {
+type: Number,
+default:0
+    },
 
    viewAttdendance:viewAttdendance,
    leaveRequest:leaveRequest,
@@ -41,6 +47,11 @@ const employeeSchema =  new Schema({
         enum: [ 'employee' , 'manager','hr manager', 'it departement', 'top managment'],
         required: true,
         default:'employee'
+    },
+    gender: {
+        type: String,
+        enum: [ 'Male','Female'],
+        required: true,
     }
 }, { discriminatorKey: 'role', collection: 'employee' });
 

@@ -1,9 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const hrMangRoute = require('./routes/hr-manager-rt');
 const path = require('path');
 require('dotenv').config();
-   
+  
 
 const MONGODB_URI =
   process.env.MONGO_URI;
@@ -21,6 +22,7 @@ const app = express();
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
 
+app.use('/hr-manager',hrMangRoute);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
