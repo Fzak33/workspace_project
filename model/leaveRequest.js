@@ -16,8 +16,8 @@ const leaveRequest =  new Schema({
     },
    
     status: {
-        type: String,
-        required: true
+        type: Boolean,
+
     },
    
 

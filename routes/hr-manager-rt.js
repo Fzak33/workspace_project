@@ -30,7 +30,13 @@ const hrManagerController = require('../controller/hr-manager-cn');
         );
 
           hrMang.put('/modify-employee', hrManagerAuth,hrManagerController.updateEmployee);
+
           hrMang.get('/get-employees', hrManagerAuth,hrManagerController.getEmployees);
+
           hrMang.delete('/delete-employees', hrManagerAuth , hrManagerController.deleteEmployees);
+
+          hrMang.get('/get-request',hrManagerAuth,hrManagerController.getReq);
+
+          hrMang.post('/modify-request', hrManagerAuth,hrManagerController.statusOfReq);
 
         module.exports =  hrMang;

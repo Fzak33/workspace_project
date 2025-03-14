@@ -2,6 +2,7 @@
 const bcrbt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const Employee = require('../model/employee');
+const Request = require('../model/leaveRequest');
 
 exports.addEmployee=async(req, res, next)=> {
     try{
@@ -13,7 +14,7 @@ if (!errors.isEmpty()) {
   error.data = errors.array();
   return next(error);
 }
-const {name,department,postion,gender } = req.body;
+const {name,department,postion,gender , salary} = req.body;
 const email = req.body.email?.trim();
 const password = req.body.password?.trim();
 
@@ -27,12 +28,13 @@ if(existEmployee){
 }
 
 let employee = new Employee({
+  salary:salary,
     email:email,
     password: hashPass,
     department:department,
     gender:gender,
-    postion:postion
-
+    postion:postion,
+  name:name
 });
 
 employee = await employee.save();
@@ -53,7 +55,7 @@ catch{
 
 exports.updateEmployee=async(req, res, next)=> {
     try{
-        const {department,postion } = req.body;
+        const {department,postion,salary } = req.body;
         const email = req.body.email?.trim();
         const employee = await Employee.findOne({email: email});
         
@@ -64,6 +66,8 @@ exports.updateEmployee=async(req, res, next)=> {
         }
         employee.department = department;
         employee.postion = postion;
+        employee.salary = salary;
+
         await employee.save();
 
         return res.json(employee);
@@ -79,7 +83,7 @@ exports.updateEmployee=async(req, res, next)=> {
     }
 };
 
-exports.getEmployees= async(reeq,res,next)=>{
+exports.getEmployees= async(req,res,next)=>{
 try{
 const employees = await Employee.find();
 return res.json(employees);
@@ -93,7 +97,7 @@ catch{
 }
 };
 
-exports.deleteEmployees= async(reeq,res,next)=>{
+exports.deleteEmployees= async(req,res,next)=>{
     try{
         const email = req.body.email?.trim();
 
@@ -108,6 +112,48 @@ return res.json({ message: 'User deleted successfully' });
 
     }
     catch{
+        if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+    }
+    };
+
+
+    exports.getReq= async(req,res,next)=>{
+      try{
+        const request = await Request.find();
+        return res.json(request);
+
+      }
+      catch{
+        if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+    }
+    };
+
+
+    // email, status{true or false}, id => update req  => endDate => date.now
+
+    exports.statusOfReq= async(req,res,next)=>{
+      try{
+        const{status ,_id} = req.body;
+        var request = await Request.findById(_id);
+        if(!request){
+          const error = new Error(`there is no request with this id`);
+        error.statusCode = 422;
+        return next(error);
+      }
+
+      request.status = status;
+      request.endDate = Date.now();
+
+      return res.json(request);
+        
+      }
+      catch{
         if (!err.statusCode) {
             err.statusCode = 500;
           }
