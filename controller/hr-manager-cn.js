@@ -3,6 +3,7 @@ const bcrbt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const Employee = require('../model/employee');
 const Request = require('../model/leaveRequest');
+const Event = require('../model/event');
 
 exports.addEmployee=async(req, res, next)=> {
     try{
@@ -159,4 +160,49 @@ return res.json({ message: 'User deleted successfully' });
           }
           next(err);
     }
+    };
+    
+    exports.getEvent= async(req,res,next)=>{
+
+      try{
+
+        const event = await Event.find();
+        return res.json(event);
+      }
+      catch{
+        if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+    }
+
+
+    };
+
+    exports.addEvent= async(req,res,next)=>{
+
+      try{
+        const {employeeEmail, eventType,eventTime} = req.body;
+
+        if(!eventTime , !eventType, !employeeEmail){
+          const error = new Error(`please phil the rest of the data`);
+        error.statusCode = 422;
+        return next(error);
+        }
+        
+        const event = new Event(
+          employeeEmail, eventType,eventTime
+        );
+        event = await event.save();
+        return res.json(event);
+
+      }
+      catch{
+        if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+    }
+
+
     };

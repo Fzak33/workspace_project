@@ -39,4 +39,10 @@ const hrManagerController = require('../controller/hr-manager-cn');
 
           hrMang.post('/modify-request', hrManagerAuth,hrManagerController.statusOfReq);
 
+          hrMang.post('/add-event', hrManagerAuth,hrManagerController.addEvent);
+
+          hrMang.get('/get-events', hrManagerAuth,hrManagerController.getEvent);
+
+
+
         module.exports =  hrMang;
