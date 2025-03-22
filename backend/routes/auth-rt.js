@@ -5,5 +5,6 @@ const authController = require('../controller/auth');
 
     authRt.post("/login", authController.login);
 
+    authRt.post("/hr-account", authController.createHrAccount);
 
     module.exports =  authRt;

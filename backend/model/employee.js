@@ -35,7 +35,6 @@ const employeeSchema =  new Schema({
     },
     loginCredentials: {
         type: String,
-        required: true
     },
     salary:{
         type:Number,
@@ -65,4 +64,4 @@ default:0
 
 const employee = mongoose.model('Employee', employeeSchema);
 
-module.exports = mongoose.model(employee, employeeSchema);
+module.exports = employee;

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const bcrbt = require('bcryptjs');
 const Employee = require('../model/employee');
 require('dotenv').config();
 
@@ -9,7 +9,7 @@ exports.login = async (req, res, next) => {
     try {
       const email = req.body.email?.trim();
       const password = req.body.password?.trim();
-  
+
       const employee = await Employee.findOne({ email: email });
       if (!employee) {
         const error = new Error('The email or password is incorrect');
@@ -41,3 +41,36 @@ exports.login = async (req, res, next) => {
     }
   };
   
+
+
+  exports.createHrAccount = async (req, res, next) => {
+    const email = req.body.email?.trim();
+    const password = req.body.password?.trim();
+    const existEmployee = await Employee.findOne({ email: email });
+      if (existEmployee) {
+        const error = new Error('The email or password is incorrect');
+        error.statusCode = 401;
+        throw error;
+      }
+  
+      const {name,department,position,gender , salary , phoneNumber} = req.body;
+
+    const hashPass =await bcrbt.hash(password , 12);
+    
+
+      let employee = new Employee({
+        phoneNumber:phoneNumber,
+        salary:salary,
+          email:email,
+          password: hashPass,
+          department:department,
+          gender:gender,
+          position:position,
+         name:name
+      });
+      employee.role = "hr manager";
+      employee = await employee.save();
+
+return  res.status(200).json(employee);
+
+  };
