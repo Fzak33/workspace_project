@@ -15,7 +15,7 @@ if (!errors.isEmpty()) {
   error.data = errors.array();
   return next(error);
 }
-const {name,department,postion,gender , salary} = req.body;
+const {name,department,position,gender , salary , phoneNumber} = req.body;
 const email = req.body.email?.trim();
 const password = req.body.password?.trim();
 
@@ -29,12 +29,13 @@ if(existEmployee){
 }
 
 let employee = new Employee({
+  phoneNumber:phoneNumber,
   salary:salary,
     email:email,
     password: hashPass,
     department:department,
     gender:gender,
-    postion:postion,
+    postion:position,
   name:name
 });
 
@@ -191,7 +192,12 @@ return res.json({ message: 'User deleted successfully' });
         }
         
         const event = new Event(
-          employeeEmail, eventType,eventTime
+
+          {employeeEmail: employeeEmail
+          , eventType: eventType
+          ,eventTime: eventTime
+        
+        }
         );
         event = await event.save();
         return res.json(event);

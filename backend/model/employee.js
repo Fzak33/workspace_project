@@ -25,7 +25,11 @@ const employeeSchema =  new Schema({
         type: String,
         required: true
     },
-    postion: {
+    position: {
+        type: String,
+        required: true
+    },
+    phoneNumber: {
         type: String,
         required: true
     },
