@@ -1,41 +1,21 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
-import { useNavigate } from 'react-router-dom';
 
-
-function Sidebar() {
-  const navigate = useNavigate();
+function Sidebar({ setActivePage }) {
   const [activeItem, setActiveItem] = useState('Dashboard');
   const [isEmployeesOpen, setIsEmployeesOpen] = useState(false);
 
   const toggleEmployeesMenu = () => {
     setIsEmployeesOpen(!isEmployeesOpen);
-  
     if (!isEmployeesOpen) {
       setActiveItem('Manage Employees');
-      navigate('/employees'); // انتبه هنا تصحح المسار
+      setActivePage('Manage Employees');
     }
   };
-  
+
   const handleItemClick = (item) => {
     setActiveItem(item);
-    if (item === 'Manage Employees') {
-      navigate('/employees');
-    } else if (item === 'Dashboard') {
-      navigate('/dashboard');
-    } else if (item === 'Attendance') {
-      navigate('/attendance');
-    } else if (item === 'Time-off') {
-      navigate('/time-off');
-    } else if (item === 'Finance') {
-      navigate('/finance');
-    } else if (item === 'Settings') {
-      navigate('/settings');
-    } else if (item === 'Profile') {
-      navigate('/profile');
-    } else if (item === 'Department') {
-      navigate('/department');
-    }
+    setActivePage(item);
   };
 
   return (

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const bcrypt  = require('bcryptjs');
+const bcrbt = require('bcryptjs');
 
 
 const Employee = require('../model/employee');
@@ -32,7 +32,7 @@ exports.login = async (req, res, next) => {
         { expiresIn: '9h' } // Token expires after 9 hours
       );
   
-      console.log(" your token "+ token + " your employee "+ employee );
+      console.log(token);
   
       return res.json({ token, ...employee._doc });
     } catch (err) {

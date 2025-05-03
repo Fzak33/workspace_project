@@ -33,6 +33,10 @@ const employeeSchema =  new Schema({
         type: String,
         required: true
     },
+    dateOfBirth: {
+        type: Date,
+      },
+      
     loginCredentials: {
         type: String,
     },
@@ -57,7 +61,7 @@ default:0
     },
     gender: {
         type: String,
-        enum: [ 'Male','Female'],
+        enum: [ 'male','female'], // ✅ لازم تكون صغيرة وبنفس الحروف
         required: true,
     }
 }, { discriminatorKey: 'role', collection: 'employee' });

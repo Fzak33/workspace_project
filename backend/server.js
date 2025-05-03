@@ -23,6 +23,12 @@ const app = express();
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // اسمح لكل المصادر تتصل
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE'); // حدد الميثودات المسموحة
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // السماح بالهيدر مثل التوكين
+  next();
+});
 
 app.use('/hr-manager',hrMangRoute);
 app.use('/auth',authRoute);

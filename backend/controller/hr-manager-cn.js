@@ -15,7 +15,8 @@ if (!errors.isEmpty()) {
   error.data = errors.array();
   return next(error);
 }
-const {name,department,position,gender , salary , phoneNumber} = req.body;
+const {name,department,position,gender , salary , phoneNumber ,   dateOfBirth,     // ✅ أضفنا هذا
+} = req.body;
 const email = req.body.email?.trim();
 const password = req.body.password?.trim();
 
@@ -29,15 +30,19 @@ if(existEmployee){
 }
 
 let employee = new Employee({
-  phoneNumber:phoneNumber,
-  salary:salary,
-    email:email,
-    password: hashPass,
-    department:department,
-    gender:gender,
-    postion:position,
-  name:name
+  phoneNumber: phoneNumber,
+  salary: salary,
+  email: email,
+  password: hashPass,
+  department: department,
+  gender: gender,
+  position: position, // هون صار تعديل على الاسم
+  name: name,
+  dateOfBirth, // ✅ أضفنا هنا
+
+  role: 'hr manager' // ✅ 
 });
+
 
 employee = await employee.save();
 
@@ -46,7 +51,7 @@ return  res.status(200).json(employee);
 
 }
 
-catch{
+catch (err) {  /* هنا صار تعديل  */
     if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -55,35 +60,63 @@ catch{
 
 };
 
-exports.updateEmployee=async(req, res, next)=> {
-    try{
-        const {department,postion,salary } = req.body;
-        const email = req.body.email?.trim();
-        const employee = await Employee.findOne({email: email});
-        
-        if(!employee){
-            const error = new Error(`there is no one with this email`);
-          error.statusCode = 422;
-          return next(error);
-        }
-        employee.department = department;
-        employee.postion = postion;
-        employee.salary = salary;
+exports.updateEmployee = async (req, res, next) => {
+  try {
+    const {
+      email,
+      name,
+      department,
+      position,
+      salary,
+      phoneNumber,
+      dateOfBirth,
+      status
+    } = req.body;
 
-        await employee.save();
+    const employee = await Employee.findOne({ email: email?.trim() });
 
-        return res.json(employee);
-
-
-
+    if (!employee) {
+      const error = new Error(`There is no employee with this email`);
+      error.statusCode = 422;
+      return next(error);
     }
-    catch{
-        if (!err.statusCode) {
-            err.statusCode = 500;
-          }
-          next(err);
+
+    // ✅ فقط الحقول المسموح بتعديلها
+    if (name) employee.name = name;
+    if (department) employee.department = department;
+    if (position) employee.position = position;
+    if (phoneNumber) employee.phoneNumber = phoneNumber;
+    if (salary !== undefined) employee.salary = salary;
+
+    // ✅ تحويل الحالة من نص إلى رقم
+    if (status === 'Active') employee.status = 0;
+    else if (status === 'On Leave') employee.status = 1;
+    else if (status === 'Inactive') employee.status = 2;
+
+    // ✅ تحديث تاريخ الميلاد إن وجد
+    if (dateOfBirth && !isNaN(Date.parse(dateOfBirth))) {
+      employee.dateOfBirth = new Date(dateOfBirth);
     }
+
+    // ✅ علاج مشكلة عدم وجود gender أو وجود قيمة غير صالحة
+    // ⛔️ لا نسمح بتعديل: email, password, role
+if (employee.gender && typeof employee.gender === 'string') {
+  employee.gender = employee.gender.toLowerCase();
+}
+
+    await employee.save();
+
+    return res.json(employee);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
+
+
+
 
 exports.getEmployees= async(req,res,next)=>{
 try{
@@ -91,7 +124,7 @@ const employees = await Employee.find();
 return res.json(employees);
 
 }
-catch{
+catch (err){
     if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -113,7 +146,7 @@ await Employee.findOneAndDelete({email: email});
 return res.json({ message: 'User deleted successfully' });
 
     }
-    catch{
+    catch (err){
         if (!err.statusCode) {
             err.statusCode = 500;
           }
@@ -128,7 +161,7 @@ return res.json({ message: 'User deleted successfully' });
         return res.json(request);
 
       }
-      catch{
+      catch (err){
         if (!err.statusCode) {
             err.statusCode = 500;
           }
@@ -155,7 +188,7 @@ return res.json({ message: 'User deleted successfully' });
       return res.json(request);
         
       }
-      catch{
+      catch (err){
         if (!err.statusCode) {
             err.statusCode = 500;
           }
@@ -170,7 +203,7 @@ return res.json({ message: 'User deleted successfully' });
         const event = await Event.find();
         return res.json(event);
       }
-      catch{
+      catch (err){
         if (!err.statusCode) {
             err.statusCode = 500;
           }
@@ -203,7 +236,7 @@ return res.json({ message: 'User deleted successfully' });
         return res.json(event);
 
       }
-      catch{
+      catch (err){
         if (!err.statusCode) {
             err.statusCode = 500;
           }

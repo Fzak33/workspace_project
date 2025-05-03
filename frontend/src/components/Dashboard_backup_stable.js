@@ -247,55 +247,47 @@ function Dashboard({ setActivePage }) {
               </div>
             </div>
             <div className="events-grid">
-  {days.map((day, index) => (
-    <div key={index} className="day-column">
-      <div className="day-label">{day.label}</div>
-      
-      <div className="event-type-section">
-        <div className="event-row">
-          <span className="event-icon">🎂</span>
-          <div className="event-images">
-            {day.events.Birthday.length > 0 ? (
-              <>
-                {day.events.Birthday.slice(0, 3).map((img, i) => (
-                  <img key={i} src={img} alt="Birthday" className="employee-img" />
-                ))}
-                {day.events.Birthday.length > 3 && (
-                  <span className="more-employees">+{day.events.Birthday.length - 3}</span>
-                )}
-              </>
-            ) : (
-              <span className="no-events">No birthdays</span>
-            )}
-          </div>
-        </div>
-
-        <div className="event-divider-horizontal"></div>
-
-
-        <div className="event-row">
-          <span className="event-icon">❤️</span>
-          <div className="event-images">
-            {day.events.Anniversary.length > 0 ? (
-              <>
-                {day.events.Anniversary.slice(0, 3).map((img, i) => (
-                  <img key={i} src={img} alt="Anniversary" className="employee-img" />
-                ))}
-                {day.events.Anniversary.length > 3 && (
-                  <span className="more-employees">+{day.events.Anniversary.length - 3}</span>
-                )}
-              </>
-            ) : (
-              <span className="no-events">No anniversaries</span>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
-
-
+              {days.map((day, index) => (
+                <div key={index} className="day-column">
+                  <div className="day-label">{day.label}</div>
+                  <div className="event-section">
+                    <div className="event-row birthday-row">
+                      <span className="event-icon">🎂</span>
+                      <span className="event-line birthday-line"></span>
+                      {day.events.Birthday.length > 0 ? (
+                        <>
+                          {day.events.Birthday.slice(0, 2).map((emp, i) => (
+                            <img key={i} src={emp} alt="Employee" className="employee-img" />
+                          ))}
+                          {day.events.Birthday.length > 2 && (
+                            <span className="more-employees">+{day.events.Birthday.length - 2}</span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="no-events">No events</span>
+                      )}
+                    </div>
+                    <div className="event-divider"></div>
+                    <div className="event-row anniversary-row">
+                      <span className="event-icon">❤️</span>
+                      <span className="event-line anniversary-line"></span>
+                      {day.events.Anniversary.length > 0 ? (
+                        <>
+                          {day.events.Anniversary.slice(0, 2).map((emp, i) => (
+                            <img key={i} src={emp} alt="Employee" className="employee-img" />
+                          ))}
+                          {day.events.Anniversary.length > 2 && (
+                            <span className="more-employees">+{day.events.Anniversary.length - 2}</span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="no-events">No events</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="event-legend">
               <div className="legend-item"><span className="event-icon">🎂</span> Birthday</div>
               <div className="legend-item"><span className="event-icon">❤️</span> Anniversary</div>

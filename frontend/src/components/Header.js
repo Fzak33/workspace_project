@@ -1,19 +1,42 @@
-import React from 'react';
-import './Header.css';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Header.css'; // تأكد عندك ملف css مناسب للتصميم
 
 function Header() {
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // حذف التوكن
+    navigate('/login'); // رجوع لصفحة تسجيل الدخول
+  };
+
   return (
-    <header className="header">
-      <h1>Workspace HR</h1>
-      <div className="user-section">
-        <span className="notification-bell">🔔</span>
-        <img
-          src="https://via.placeholder.com/40" // استبدلها برابط صورة حقيقية إذا أردت
-          alt="Employee"
-          className="employee-pic"
-        />
+    <div className="header">
+      <div className="header-left">
+        {/* ممكن شعار أو اسم الشركة */}
+        <h2>WorkSpace HR</h2>
       </div>
-    </header>
+
+      <div className="header-right">
+        <div className="profile" onClick={toggleDropdown}>
+          <img
+            src="https://via.placeholder.com/40" 
+            alt="Profile"
+            className="profile-img"
+          />
+          {dropdownOpen && (
+            <div className="dropdown-menu">
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

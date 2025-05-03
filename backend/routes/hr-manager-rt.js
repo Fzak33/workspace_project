@@ -33,7 +33,7 @@ const hrManagerController = require('../controller/hr-manager-cn');
 
           hrMang.get('/get-employees', hrManagerAuth,hrManagerController.getEmployees);
 
-          hrMang.delete('/delete-employees', hrManagerAuth , hrManagerController.deleteEmployees);
+          hrMang.delete('/delete-employee', hrManagerAuth , hrManagerController.deleteEmployees);
 
           hrMang.get('/get-request',hrManagerAuth,hrManagerController.getReq);
 
