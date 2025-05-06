@@ -16,6 +16,7 @@ const HrSocket = (io) => {
 
             employeeReq.status = status;
             employeeReq.endDate = Date.now;
+            await employeeReq.save();
 
             io.of("/empolyee").to("hr manager").emit("employeeReq", employeeReq);
             callback({ success: true});
