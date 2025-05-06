@@ -1,0 +1,55 @@
+.department-container {
+    background-color: #fcefee;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px;
+  }
+  
+  .department-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .add-department-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .department-search input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+  }
+  
+  .department-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .department-table th,
+  .department-table td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .action-icons button {
+    margin-right: 5px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+  }
+  

@@ -5,60 +5,76 @@ const Employee = require('../model/employee');
 const Request = require('../model/leaveRequest');
 const Event = require('../model/event');
 
-exports.addEmployee=async(req, res, next)=> {
-    try{
-const errors = validationResult(req);
-if (!errors.isEmpty()) {
-  const errorMessages = errors.array().map((err) => err.msg).join(', ');
-  const error = new Error(`Validation failed: ${errorMessages}`);
-  error.statusCode = 422;
-  error.data = errors.array();
-  return next(error);
-}
-const {name,department,position,gender , salary , phoneNumber ,   dateOfBirth,     // ✅ أضفنا هذا
-} = req.body;
-const email = req.body.email?.trim();
-const password = req.body.password?.trim();
+exports.addEmployee = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((err) => err.msg).join(', ');
+      const error = new Error(`Validation failed: ${errorMessages}`);
+      error.statusCode = 422;
+      error.data = errors.array();
+      return next(error);
+    }
 
-const existEmployee = await Employee.findOne({email: email});
-const hashPass =await bcrbt.hash(password , 12);
+    const {
+      name,
+      department,
+      position,
+      gender,
+      salary,
+      phoneNumber,
+      dateOfBirth,     // ✅ أضفنا هذا
+    } = req.body;
 
-if(existEmployee){
-    const error = new Error(`email already exist`);
-  error.statusCode = 422;
-  return next(error);
-}
+    const email = req.body.email?.trim();
+    const password = req.body.password?.trim();
 
-let employee = new Employee({
-  phoneNumber: phoneNumber,
-  salary: salary,
-  email: email,
-  password: hashPass,
-  department: department,
-  gender: gender,
-  position: position, // هون صار تعديل على الاسم
-  name: name,
-  dateOfBirth, // ✅ أضفنا هنا
+    const existEmployee = await Employee.findOne({ email: email });
+    const hashPass = await bcrbt.hash(password, 12);
 
-  role: 'hr manager' // ✅ 
-});
+    if (existEmployee) {
+      const error = new Error(`email already exist`);
+      error.statusCode = 422;
+      return next(error);
+    }
 
+    let employee = new Employee({
+      phoneNumber: phoneNumber,
+      salary: salary,
+      email: email,
+      password: hashPass,
+      department: department,
+      gender: gender,
+      position: position, // هون صار تعديل على الاسم
+      name: name,
+      dateOfBirth, // ✅ أضفنا هنا
+      role: 'hr manager' // ✅ 
+    });
 
-employee = await employee.save();
+    employee = await employee.save();
 
-return  res.status(200).json(employee);
+    // ✅ تم إضافة هذا الجزء لإنشاء حدث عيد ميلاد تلقائي عند إضافة موظف جديد
+    if (employee.dateOfBirth) {
+      const currentYear = new Date().getFullYear();
+      const originalDate = new Date(employee.dateOfBirth);
+      const birthdayThisYear = new Date(currentYear, originalDate.getMonth(), originalDate.getDate());
 
+      await Event.create({
+        employeeEmail: employee.email,
+        eventType: 'Birthday',
+        eventTime: birthdayThisYear,
+      });
+    }
 
-}
-
-catch (err) {  /* هنا صار تعديل  */
+    return res.status(200).json(employee);
+  } catch (err) {  /* هنا صار تعديل  */
     if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-}
-
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
+
 
 exports.updateEmployee = async (req, res, next) => {
   try {
@@ -213,35 +229,33 @@ return res.json({ message: 'User deleted successfully' });
 
     };
 
-    exports.addEvent= async(req,res,next)=>{
-
-      try{
-        const {employeeEmail, eventType,eventTime} = req.body;
-
-        if(!eventTime , !eventType, !employeeEmail){
-          const error = new Error(`please phil the rest of the data`);
-        error.statusCode = 422;
-        return next(error);
+    exports.addEvent = async (req, res, next) => {
+      try {
+        const { employeeEmail, eventType, eventTime } = req.body;
+    
+        // التحقق من أن جميع الحقول المطلوبة موجودة
+        if (!eventTime || !eventType || !employeeEmail) {
+          const error = new Error(`Please fill in all required fields`);
+          error.statusCode = 422;
+          return next(error);
         }
-        
-        const event = new Event(
-
-          {employeeEmail: employeeEmail
-          , eventType: eventType
-          ,eventTime: eventTime
-        
-        }
-        );
-        event = await event.save();
-        return res.json(event);
-
-      }
-      catch (err){
+    
+        // ✅ استخدمنا let بدل const لأننا نحتاج لإعادة تعيين المتغير بعد .save()
+        let event = new Event({
+          employeeEmail: employeeEmail,
+          eventType: eventType,
+          eventTime: eventTime
+        });
+    
+        event = await event.save(); // ✅ هذا السطر كان يسبب الخطأ لأن const لا تسمح بإعادة التعيين
+    
+        return res.json(event); // ✅ إرجاع الحدث المضاف للواجهة الأمامية
+    
+      } catch (err) {
         if (!err.statusCode) {
-            err.statusCode = 500;
-          }
-          next(err);
-    }
-
-
+          err.statusCode = 500;
+        }
+        next(err); // ✅ تمرير الخطأ إلى middleware الخاص بالتعامل مع الأخطاء
+      }
     };
+    

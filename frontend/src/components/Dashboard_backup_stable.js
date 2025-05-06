@@ -3,7 +3,7 @@ import './Dashboard.css';
 
 function Dashboard({ setActivePage }) {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date('2024-01-09'));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState(null);
@@ -29,7 +29,9 @@ function Dashboard({ setActivePage }) {
   const [activeRejectIndex, setActiveRejectIndex] = useState(null); // index of the employee being rejected
   const [rejectTargetType, setRejectTargetType] = useState(''); // 'timeOff' or 'attendance'
  
-  
+  const [allEmployees, setAllEmployees] = useState([]);
+const [selectedEmployeeEmail, setSelectedEmployeeEmail] = useState('');
+
 
 
   useEffect(() => {
@@ -38,16 +40,35 @@ function Dashboard({ setActivePage }) {
       try {
         const res = await fetch('http://localhost:3000/hr-manager/get-events', {
           method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
   
-        if (res.ok) {
-          const data = await res.json();
-          console.log('Fetched events:', data);
-          // ممكن نخزنها لاحقًا في state وتستخدم بدل الأحداث الثابتة
+        if (!res.ok) {
+          console.error('Failed to fetch events');
+          return;
         }
+  
+        const events = await res.json();
+  
+        // ✅ معالجة أحداث قاعدة البيانات فقط (بدون تكرار)
+        const formatted = events.reduce((acc, event) => {
+          const eventDate = new Date(event.eventTime);
+          const day = eventDate.getDate();
+          const month = eventDate.getMonth();
+          const key = `${day}-${month}`;
+          if (!acc[key]) acc[key] = { Birthday: [], Anniversary: [] };
+          acc[key][event.eventType]?.push(event.employeeImage || 'user1.png');
+          return acc;
+        }, {});
+  
+        setCustomEvents(formatted);
+        const empRes = await fetch('http://localhost:3000/hr-manager/get-employees', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const employees = await empRes.json();
+        setAllEmployees(employees); // 👈 سنعرف هذه لاحقًا في useState
+        
       } catch (error) {
         console.error('Error fetching events:', error.message);
       }
@@ -75,34 +96,26 @@ function Dashboard({ setActivePage }) {
 
   const getEventsForDay = (day) => {
     const date = day.getDate();
+    const month = day.getMonth();
+    const key = `${date}-${month}`;
     const events = { Birthday: [], Anniversary: [] };
-
-    if (date === 9) {
-      events.Birthday = ['user1.png', 'user2.png'];
-      events.Anniversary = ['user3.png'];
-    } else if (date === 10) {
-      events.Birthday = ['user4.png'];
-    } else if (date === 11) {
-      events.Anniversary = ['user5.png'];
-    } else if (date === 12) {
-      events.Birthday = ['user6.png', 'user7.png'];
-    }
-
-    const custom = customEvents[date];
+  
+    const custom = customEvents[key];
     if (custom) {
       if (custom.Birthday) events.Birthday.push(...custom.Birthday);
       if (custom.Anniversary) events.Anniversary.push(...custom.Anniversary);
     }
-
+  
     return events;
   };
+  
 
   const handleAddEvent = async () => {
     const token = localStorage.getItem('token');
-    if (!token) return alert('Unauthorized');
+    if (!token || !selectedEmployeeEmail) return alert('Please select an employee.');
   
     const payload = {
-      employeeEmail: 'demo@example.com', // ⚠️ غيّر هذا لاحقًا ليأخذ إيميل حقيقي
+      employeeEmail: selectedEmployeeEmail,
       eventType: newEventType,
       eventTime: newEventDate,
     };
@@ -118,8 +131,7 @@ function Dashboard({ setActivePage }) {
       });
   
       if (res.ok) {
-        const result = await res.json();
-        console.log('Event added:', result);
+        console.log('Event added successfully');
         setShowAddEventModal(false);
       } else {
         const err = await res.json();
@@ -130,22 +142,38 @@ function Dashboard({ setActivePage }) {
     }
   };
   
+  
 
-  const handleDeleteEvent = () => {
-    const day = new Date(newEventDate).getDate();
-    setCustomEvents((prev) => {
-      const current = prev[day];
-      if (!current) return prev;
-      return {
-        ...prev,
-        [day]: {
-          ...current,
-          [newEventType]: current[newEventType].filter((img) => img !== newEventImage),
+  const handleDeleteEvent = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || !selectedEmployeeEmail || !newEventDate) return alert('Missing info for deletion.');
+  
+    try {
+      const res = await fetch('http://localhost:3000/hr-manager/delete-event', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-      };
-    });
-    setShowAddEventModal(false);
+        body: JSON.stringify({
+          employeeEmail: selectedEmployeeEmail,
+          eventType: newEventType,
+          eventTime: newEventDate,
+        }),
+      });
+  
+      if (res.ok) {
+        console.log('Event deleted');
+        setShowAddEventModal(false);
+      } else {
+        const err = await res.json();
+        console.error('Error deleting event:', err.message);
+      }
+    } catch (error) {
+      console.error('Delete error:', error.message);
+    }
   };
+  
 
   const handleDateChange = (e) => {
     const newDate = new Date(e.target.value);
@@ -243,51 +271,59 @@ function Dashboard({ setActivePage }) {
                 <div className="calendar-header" onClick={() => setIsDatePickerOpen(true)}>
                   📅 {`${selectedDate.getDate()} ${selectedDate.toLocaleString('en', { month: 'short' })}`}
                 </div>
-                <button className="add-event-button" onClick={() => setShowAddEventModal(true)}>+ Add Event</button>
-              </div>
+                <button className="add-event-button" onClick={() => setShowAddEventModal(true)}>⚙️ Manage Events</button>
+                </div>
             </div>
             <div className="events-grid">
-              {days.map((day, index) => (
-                <div key={index} className="day-column">
-                  <div className="day-label">{day.label}</div>
-                  <div className="event-section">
-                    <div className="event-row birthday-row">
-                      <span className="event-icon">🎂</span>
-                      <span className="event-line birthday-line"></span>
-                      {day.events.Birthday.length > 0 ? (
-                        <>
-                          {day.events.Birthday.slice(0, 2).map((emp, i) => (
-                            <img key={i} src={emp} alt="Employee" className="employee-img" />
-                          ))}
-                          {day.events.Birthday.length > 2 && (
-                            <span className="more-employees">+{day.events.Birthday.length - 2}</span>
-                          )}
-                        </>
-                      ) : (
-                        <span className="no-events">No events</span>
-                      )}
-                    </div>
-                    <div className="event-divider"></div>
-                    <div className="event-row anniversary-row">
-                      <span className="event-icon">❤️</span>
-                      <span className="event-line anniversary-line"></span>
-                      {day.events.Anniversary.length > 0 ? (
-                        <>
-                          {day.events.Anniversary.slice(0, 2).map((emp, i) => (
-                            <img key={i} src={emp} alt="Employee" className="employee-img" />
-                          ))}
-                          {day.events.Anniversary.length > 2 && (
-                            <span className="more-employees">+{day.events.Anniversary.length - 2}</span>
-                          )}
-                        </>
-                      ) : (
-                        <span className="no-events">No events</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+  {days.map((day, index) => (
+    <div key={index} className="day-column">
+      <div className="day-label">{day.label}</div>
+      
+      <div className="event-type-section">
+        <div className="event-row">
+          <span className="event-icon">🎂</span>
+          <div className="event-images">
+            {day.events.Birthday.length > 0 ? (
+              <>
+                {day.events.Birthday.slice(0, 3).map((img, i) => (
+                  <img key={i} src={img} alt="Birthday" className="employee-img" />
+                ))}
+                {day.events.Birthday.length > 3 && (
+                  <span className="more-employees">+{day.events.Birthday.length - 3}</span>
+                )}
+              </>
+            ) : (
+              <span className="no-events">No birthdays</span>
+            )}
+          </div>
+        </div>
+
+        <div className="event-divider-horizontal"></div>
+
+
+        <div className="event-row">
+          <span className="event-icon">❤️</span>
+          <div className="event-images">
+            {day.events.Anniversary.length > 0 ? (
+              <>
+                {day.events.Anniversary.slice(0, 3).map((img, i) => (
+                  <img key={i} src={img} alt="Anniversary" className="employee-img" />
+                ))}
+                {day.events.Anniversary.length > 3 && (
+                  <span className="more-employees">+{day.events.Anniversary.length - 3}</span>
+                )}
+              </>
+            ) : (
+              <span className="no-events">No anniversaries</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+
             <div className="event-legend">
               <div className="legend-item"><span className="event-icon">🎂</span> Birthday</div>
               <div className="legend-item"><span className="event-icon">❤️</span> Anniversary</div>
@@ -478,30 +514,40 @@ function Dashboard({ setActivePage }) {
         </>
       )}
 
-      {showAddEventModal && (
-        <>
-          <div className="modal-overlay" onClick={() => setShowAddEventModal(false)}></div>
-          <div className="add-event-modal">
-            <h3>Add New Event</h3>
-            <label>Event Type:
-              <select value={newEventType} onChange={(e) => setNewEventType(e.target.value)}>
-                <option value="Birthday">🎂 Birthday</option>
-                <option value="Anniversary">❤️ Anniversary</option>
-              </select>
-            </label>
-            <label>Event Date:
-              <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} />
-            </label>
-            <label>Image URL:
-              <input type="text" value={newEventImage} onChange={(e) => setNewEventImage(e.target.value)} placeholder="e.g. user9.png" />
-            </label>
-            <div className="modal-buttons">
-              <button onClick={handleAddEvent}>Add</button>
-              <button onClick={handleDeleteEvent}>Delete</button>
-            </div>
-          </div>
-        </>
-      )}
+{showAddEventModal && (
+  <>
+    <div className="modal-overlay" onClick={() => setShowAddEventModal(false)}></div>
+    <div className="add-event-modal">
+      <h3>Manage Event</h3>
+
+      <label>Select Employee:
+        <select value={selectedEmployeeEmail} onChange={(e) => setSelectedEmployeeEmail(e.target.value)}>
+          <option value="">-- Select --</option>
+          {allEmployees.map((emp, idx) => (
+            <option key={idx} value={emp.email}>{emp.name} - {emp.email}</option>
+          ))}
+        </select>
+      </label>
+
+      <label>Event Type:
+        <select value={newEventType} onChange={(e) => setNewEventType(e.target.value)}>
+          <option value="Birthday">🎂 Birthday</option>
+          <option value="Anniversary">❤️ Anniversary</option>
+        </select>
+      </label>
+
+      <label>Event Date:
+        <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} />
+      </label>
+
+      <div className="modal-buttons">
+        <button onClick={handleAddEvent}>Add</button>
+        <button onClick={handleDeleteEvent}>Delete</button>
+      </div>
+    </div>
+  </>
+)}
+
 
       {clockOutMessage && (
         <>

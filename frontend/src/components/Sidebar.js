@@ -34,7 +34,7 @@ function Sidebar() {
     } else if (item === 'Profile') {
       navigate('/profile');
     } else if (item === 'Department') {
-      navigate('/department');
+      navigate('/departments');
     }
   };
 

@@ -3,7 +3,7 @@ import './Dashboard.css';
 
 function Dashboard({ setActivePage }) {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date('2024-01-09'));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isClockedIn, setIsClockedIn] = useState(false);
   const [clockInTime, setClockInTime] = useState(null);
@@ -29,32 +29,59 @@ function Dashboard({ setActivePage }) {
   const [activeRejectIndex, setActiveRejectIndex] = useState(null); // index of the employee being rejected
   const [rejectTargetType, setRejectTargetType] = useState(''); // 'timeOff' or 'attendance'
  
+  const [allEmployees, setAllEmployees] = useState([]);
+  const [selectedEmployeeEmail, setSelectedEmployeeEmail] = useState('');
+  const [isAddingEvent, setIsAddingEvent] = useState(false);
+
+  const [successMessage, setSuccessMessage] = useState('');
+
   
+  
+
 
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch('http://localhost:3000/hr-manager/get-events', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        if (res.ok) {
-          const data = await res.json();
-          console.log('Fetched events:', data);
-          // ممكن نخزنها لاحقًا في state وتستخدم بدل الأحداث الثابتة
-        }
-      } catch (error) {
-        console.error('Error fetching events:', error.message);
-      }
-    };
-  
     fetchEvents();
   }, []);
+  
+  const fetchEvents = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/hr-manager/get-events', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (!res.ok) {
+        console.error('Failed to fetch events');
+        return;
+      }
+  
+      const events = await res.json();
+  
+      const formatted = events.reduce((acc, event) => {
+        const eventDate = new Date(event.eventTime);
+        const day = eventDate.getDate();
+        const month = eventDate.getMonth();
+        const key = `${day}-${month}`;
+        if (!acc[key]) acc[key] = { Birthday: [], Anniversary: [] };
+        acc[key][event.eventType]?.push(event.employeeImage || 'user1.png');
+        return acc;
+      }, {});
+  
+      setCustomEvents(formatted);
+  
+      const empRes = await fetch('http://localhost:3000/hr-manager/get-employees', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      const employees = await empRes.json();
+      setAllEmployees(employees);
+    } catch (error) {
+      console.error('Error fetching events:', error.message);
+    }
+  };
   
 
 
@@ -75,34 +102,29 @@ function Dashboard({ setActivePage }) {
 
   const getEventsForDay = (day) => {
     const date = day.getDate();
+    const month = day.getMonth();
+    const key = `${date}-${month}`;
     const events = { Birthday: [], Anniversary: [] };
-
-    if (date === 9) {
-      events.Birthday = ['user1.png', 'user2.png'];
-      events.Anniversary = ['user3.png'];
-    } else if (date === 10) {
-      events.Birthday = ['user4.png'];
-    } else if (date === 11) {
-      events.Anniversary = ['user5.png'];
-    } else if (date === 12) {
-      events.Birthday = ['user6.png', 'user7.png'];
-    }
-
-    const custom = customEvents[date];
+  
+    const custom = customEvents[key];
     if (custom) {
       if (custom.Birthday) events.Birthday.push(...custom.Birthday);
       if (custom.Anniversary) events.Anniversary.push(...custom.Anniversary);
     }
-
+  
     return events;
   };
+  
 
   const handleAddEvent = async () => {
     const token = localStorage.getItem('token');
-    if (!token) return alert('Unauthorized');
+    if (!token || !selectedEmployeeEmail) return alert('Please select an employee.');
+    if (isAddingEvent) return;
+  
+    setIsAddingEvent(true);
   
     const payload = {
-      employeeEmail: 'demo@example.com', // ⚠️ غيّر هذا لاحقًا ليأخذ إيميل حقيقي
+      employeeEmail: selectedEmployeeEmail,
       eventType: newEventType,
       eventTime: newEventDate,
     };
@@ -117,35 +139,65 @@ function Dashboard({ setActivePage }) {
         body: JSON.stringify(payload),
       });
   
-      if (res.ok) {
-        const result = await res.json();
-        console.log('Event added:', result);
-        setShowAddEventModal(false);
-      } else {
-        const err = await res.json();
-        console.error('Error adding event:', err.message);
+      try {
+        const data = await res.json(); // حاول قراءة الرد دائمًا
+        if (res.status === 200 || res.status === 201) {
+          setSuccessMessage('✅ Event added successfully!');
+          setShowAddEventModal(false);
+          await fetchEvents();
+          setTimeout(() => setSuccessMessage(''), 3000);
+        } else {
+          console.error('Unexpected status:', res.status, data);
+          alert('Failed to add event');
+        }
+      } catch (error) {
+        console.error('Error parsing response:', error);
+        alert('Failed to add event (invalid response format)');
       }
+      
+      
     } catch (error) {
       console.error('Network error:', error.message);
+      alert('Network error');
+    } finally {
+      setIsAddingEvent(false);
     }
   };
   
+  
+  
+  
 
-  const handleDeleteEvent = () => {
-    const day = new Date(newEventDate).getDate();
-    setCustomEvents((prev) => {
-      const current = prev[day];
-      if (!current) return prev;
-      return {
-        ...prev,
-        [day]: {
-          ...current,
-          [newEventType]: current[newEventType].filter((img) => img !== newEventImage),
+  const handleDeleteEvent = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || !selectedEmployeeEmail || !newEventDate) return alert('Missing info for deletion.');
+  
+    try {
+      const res = await fetch('http://localhost:3000/hr-manager/delete-event', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-      };
-    });
-    setShowAddEventModal(false);
+        body: JSON.stringify({
+          employeeEmail: selectedEmployeeEmail,
+          eventType: newEventType,
+          eventTime: newEventDate,
+        }),
+      });
+  
+      if (res.ok) {
+        console.log('Event deleted');
+        setShowAddEventModal(false);
+      } else {
+        const err = await res.json();
+        console.error('Error deleting event:', err.message);
+      }
+    } catch (error) {
+      console.error('Delete error:', error.message);
+    }
   };
+  
 
   const handleDateChange = (e) => {
     const newDate = new Date(e.target.value);
@@ -231,8 +283,16 @@ function Dashboard({ setActivePage }) {
   ];
 
   const days = getDays();
-  return (
+
+  
+  
+  return ( 
     <div className="dashboard-container">
+      {successMessage && (
+    <div className="success-alert">
+      {successMessage}
+    </div>
+  )}
       <div className="content-wrapper">
         {/* العمود الأيسر */}
         <div className="left-column">
@@ -243,8 +303,8 @@ function Dashboard({ setActivePage }) {
                 <div className="calendar-header" onClick={() => setIsDatePickerOpen(true)}>
                   📅 {`${selectedDate.getDate()} ${selectedDate.toLocaleString('en', { month: 'short' })}`}
                 </div>
-                <button className="add-event-button" onClick={() => setShowAddEventModal(true)}>+ Add Event</button>
-              </div>
+                <button className="add-event-button" onClick={() => setShowAddEventModal(true)}>⚙️ Manage Events</button>
+                </div>
             </div>
             <div className="events-grid">
   {days.map((day, index) => (
@@ -486,30 +546,43 @@ function Dashboard({ setActivePage }) {
         </>
       )}
 
-      {showAddEventModal && (
-        <>
-          <div className="modal-overlay" onClick={() => setShowAddEventModal(false)}></div>
-          <div className="add-event-modal">
-            <h3>Add New Event</h3>
-            <label>Event Type:
-              <select value={newEventType} onChange={(e) => setNewEventType(e.target.value)}>
-                <option value="Birthday">🎂 Birthday</option>
-                <option value="Anniversary">❤️ Anniversary</option>
-              </select>
-            </label>
-            <label>Event Date:
-              <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} />
-            </label>
-            <label>Image URL:
-              <input type="text" value={newEventImage} onChange={(e) => setNewEventImage(e.target.value)} placeholder="e.g. user9.png" />
-            </label>
-            <div className="modal-buttons">
-              <button onClick={handleAddEvent}>Add</button>
-              <button onClick={handleDeleteEvent}>Delete</button>
-            </div>
-          </div>
-        </>
-      )}
+{showAddEventModal && (
+  <>
+    <div className="modal-overlay" onClick={() => setShowAddEventModal(false)}></div>
+    <div className="add-event-modal">
+      <h3>Manage Event</h3>
+
+      <label>Select Employee:
+        <select value={selectedEmployeeEmail} onChange={(e) => setSelectedEmployeeEmail(e.target.value)}>
+          <option value="">-- Select --</option>
+          {allEmployees.map((emp, idx) => (
+            <option key={idx} value={emp.email}>{emp.name} - {emp.email}</option>
+          ))}
+        </select>
+      </label>
+
+      <label>Event Type:
+        <select value={newEventType} onChange={(e) => setNewEventType(e.target.value)}>
+          <option value="Birthday">🎂 Birthday</option>
+          <option value="Anniversary">❤️ Anniversary</option>
+        </select>
+      </label>
+
+      <label>Event Date:
+        <input type="date" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} />
+      </label>
+
+      <div className="modal-buttons">
+        <button onClick={handleAddEvent} disabled={isAddingEvent}>
+          {isAddingEvent ? 'Adding...' : 'Add'}
+        </button>
+        <button onClick={handleDeleteEvent}>Delete</button>
+      </div>
+    </div>
+  </>
+)}
+
+
 
       {clockOutMessage && (
         <>

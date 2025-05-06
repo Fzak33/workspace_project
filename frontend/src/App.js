@@ -10,6 +10,10 @@ import Header from './components/Header';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import TimeOff from './components/TimeOff';
+import ManageDepartment from './components/ManageDepartment';
+import Finance from './components/Finance';
+
+
 
 
 function App() {
@@ -23,7 +27,14 @@ function App() {
       <div className="main-content">
         {!isLoginPage && <Header />}
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+<Route
+  path="/"
+  element={
+    localStorage.getItem('token')
+      ? <Navigate to="/dashboard" />
+      : <Navigate to="/login" />
+  }
+/>
           <Route path="/login" element={<Login />} />
           <Route
             path="/dashboard"
@@ -58,6 +69,24 @@ function App() {
               
   }
 />
+<Route
+  path="/departments"
+  element={
+    <ProtectedRoute>
+      <ManageDepartment />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/finance"
+  element={
+    <ProtectedRoute>
+      <Finance />
+    </ProtectedRoute>
+  }
+/>
+
+
 
           
           {/* باقي التبويبات لاحقاً */}
