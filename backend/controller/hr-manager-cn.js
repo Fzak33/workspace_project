@@ -259,3 +259,28 @@ return res.json({ message: 'User deleted successfully' });
       }
     };
     
+
+    exports.manageDepartment = async (req, res, next) => {
+      try{
+    const {email, department} = req.body;
+    let employee = await Employee.findOne({email: email});
+
+    if(!employee){
+      const error = new Error(`there is no one with this email`);
+    error.statusCode = 422;
+    return next(error);
+  };
+  if(department == "HR"){
+    employee.role = "hr manager";
+  }
+  employee.position = "manager";
+  return res.json(employee);
+
+      }
+      catch (err) {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err); 
+      }
+    };

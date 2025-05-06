@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const viewAttdendance = require('./viewAttendance');
-const leaveRequest = require('./leaveRequest');
+const {leaveRequestSchema} = require('./leaveRequest');
 const feedback = require('./feedback');
 
 const employeeSchema =  new Schema({
@@ -50,7 +50,7 @@ default:0
     },
 
    viewAttdendance:viewAttdendance,
-   leaveRequest:leaveRequest,
+   leaveRequest:leaveRequestSchema,
    feedback:feedback,
    
     role: {

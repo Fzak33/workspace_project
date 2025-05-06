@@ -43,6 +43,7 @@ const hrManagerController = require('../controller/hr-manager-cn');
 
           hrMang.get('/get-events', hrManagerAuth,hrManagerController.getEvent);
 
+          hrMang.post('/manage-department', hrManagerAuth,hrManagerController.manageDepartment);
 
 
         module.exports =  hrMang;

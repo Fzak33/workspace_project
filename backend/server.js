@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const hrMangRoute = require('./routes/hr-manager-rt');
 const authRoute = require('./routes/auth-rt');
-
+const http = require('http');
+const employeeSocket = require("./socket-contorller/employee");
+const HrSocket = require("./socket-contorller/hr-manager");
 const path = require('path');
 require('dotenv').config();
   
@@ -26,7 +28,7 @@ app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*'); // اسمح لكل المصادر تتصل
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE'); // حدد الميثودات المسموحة
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // السماح بالهيدر مثل التوكين
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-auth-token'); // السماح بالهيدر مثل التوكين
   next();
 });
 
@@ -39,18 +41,23 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message });
 });
 
-mongoose
-  .connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI)
   .then(() => {
-    console.log("conect  succsse");
+    console.log("✅ MongoDB connected");
 
-  const server =  app.listen(PORT, () => {
-  console.log(`connected at port ${PORT}`);
+    const server = http.createServer(app);
 
-});
- 
+    server.listen(PORT, () => {
+      console.log(`🚀 HTTP server running on port ${PORT}`);
+
+      // Initialize Socket.IO
+      const io = require('./socket').init(server);
+      employeeSocket(io);
+      HrSocket(io);
+    });
   })
-  .catch((e) => {
-    console.log(e);
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
   });
+
 
