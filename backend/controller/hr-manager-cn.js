@@ -4,6 +4,7 @@ const { validationResult } = require('express-validator');
 const Employee = require('../model/employee');
 const Request = require('../model/leaveRequest');
 const Event = require('../model/event');
+const {leaveRequest} = require('../model/leaveRequest');
 
 exports.addEmployee = async (req, res, next) => {
   try {
@@ -283,4 +284,17 @@ return res.json({ message: 'User deleted successfully' });
         }
         next(err); 
       }
+    };
+
+    exports.getReq = async (req, res, next) => {
+try{
+let getEmployeeReq = leaveRequest.find();
+return res.json(getEmployeeReq);
+}
+catch (err) {
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
+  next(err); 
+}
     };
