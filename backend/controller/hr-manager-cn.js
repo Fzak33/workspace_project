@@ -288,7 +288,7 @@ return res.json({ message: 'User deleted successfully' });
 
     exports.getReq = async (req, res, next) => {
 try{
-let getEmployeeReq = leaveRequest.find();
+let getEmployeeReq = leaveRequest.find({status: null});
 return res.json(getEmployeeReq);
 }
 catch (err) {
