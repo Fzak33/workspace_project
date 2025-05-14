@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css'; // Optional styling
+import { Employee} from './models/employee-model';
 
 function Login() {
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ function Login() {
     }
 
     if (response.ok && data.role) {
+
+      const employee = Employee.fromJson(data);
+
+  // Optional: store employee in localStorage (use JSON.stringify)
+  localStorage.setItem('employee', JSON.stringify(employee.toJson()));
       // Store role in localStorage
       localStorage.setItem('role', data.role); // Store role
  localStorage.setItem('token', data.token); 
