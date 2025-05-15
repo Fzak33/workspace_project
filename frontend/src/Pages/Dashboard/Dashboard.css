@@ -1,0 +1,36 @@
+.Header{
+background-color: rgb(249, 214, 214);
+height: fit-content;
+}
+
+.TaskCss{
+    position: absolute;
+   top: 9% ;
+    left:3% ;
+    float:left;
+    }
+    .Points{
+        position: absolute;
+        top: 59%;
+        left: 20%;
+    }
+    .Leaderboard{
+        position: absolute;
+        top: 59%;
+        left: 43%;
+    }
+    .Clock{
+        position: absolute;
+        bottom: 67%;
+        right: 5%;
+    }
+    .Courses{
+        position: absolute;
+        bottom: 18%;
+        right: 3%;
+    }
+    .Awards{
+        position: absolute;
+        top: 85%;
+        right: 3%;
+    }

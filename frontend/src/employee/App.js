@@ -1,23 +1,27 @@
-// employee/App.js
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import './styles/App.css';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Dashboard from './Pages/Dashboard/Dashboard';
 import LearnPage from './Pages/Learn/learnpage';
 import TaskPage from './Pages/Tasks/Tasks';
 import Teame from './Pages/Teame/Teame';
+import EmployeeLayout from '../layouts/EmployeeLayout';
 
 function App() {
   return (
-    <div className="Main">
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="learn" element={<LearnPage />} />
-        <Route path="tasks" element={<TaskPage />} />
-        <Route path="team" element={<Teame />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="dashboard" />} />
+      <Route path="*" element={
+        <EmployeeLayout>
+          <Routes>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="learn" element={<LearnPage />} />
+            <Route path="tasks" element={<TaskPage />} />
+            <Route path="team" element={<Teame />} />
+          </Routes>
+        </EmployeeLayout>
+      } />
+    </Routes>
   );
 }
 

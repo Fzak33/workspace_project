@@ -1,3 +1,4 @@
+// Sidebar.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useLocation } from 'react-router-dom';
@@ -7,6 +8,9 @@ import dashboardIcon from './Ellipse 45.png'; // صورة Dashboard
 import learnIcon from './Ellipse 47.png'; // صورة Learn
 import tasksIcon from './task.png'; // صورة Tasks
 import teamIcon from './Ellipse 46.png'; // صورة Team
+import awardsIcon from './Ellipse 40.png'; // صورة Awards
+import profileIcon from './frame.png'; // صورة Profile
+import settingIcon from './setting-2.png'; // صورة Setting
 import './Sidebar.css';
 
 function Sidebar() {
@@ -17,12 +21,16 @@ function Sidebar() {
   const [chatMessages, setChatMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Update active item when route changes
   useEffect(() => {
     const path = location.pathname;
-    if (path === '/employee/dashboard') setActiveItem('dashboard');
-    else if (path === '/employee/learn') setActiveItem('learn');
-    else if (path === '/employee/tasks') setActiveItem('tasks');
-    else if (path === '/employee/team') setActiveItem('team');
+    if (path === '/') setActiveItem('dashboard');
+    else if (path === '/learn') setActiveItem('learn');
+    else if (path === '/tasks') setActiveItem('tasks');
+    else if (path === '/team') setActiveItem('team');
+    else if (path === '/awards') setActiveItem('awards');
+    else if (path === '/profile') setActiveItem('profile');
+    else if (path === '/setting') setActiveItem('setting');
   }, [location]);
 
   const toggleChat = () => {
@@ -61,7 +69,7 @@ function Sidebar() {
       console.error('Error fetching AI response:', error);
       setChatMessages((prevMessages) => [
         ...prevMessages,
-        { text: 'I am a robot chat. Ask me anything!', sender: 'ai' },
+        { text: 'Iam A Rubote chat Ask me?.', sender: 'ai' },
       ]);
     } finally {
       setIsLoading(false);
@@ -69,10 +77,16 @@ function Sidebar() {
   };
 
   const navigationItems = [
-    { id: 'dashboard', icon: dashboardIcon, text: 'Dashboard', path: '/employee/dashboard' },
-    { id: 'learn', icon: learnIcon, text: 'Learn', path: '/employee/learn' },
-    { id: 'tasks', icon: tasksIcon, text: 'Tasks', path: '/employee/tasks' },
-    { id: 'team', icon: teamIcon, text: 'Team', path: '/employee/team' },
+    { id: 'dashboard', icon: dashboardIcon, text: 'Dashboard', path: '/' },
+    { id: 'learn', icon: learnIcon, text: 'Learn', path: '/learn' },
+    { id: 'tasks', icon: tasksIcon, text: 'Tasks', path: '/tasks' },
+    { id: 'team', icon: teamIcon, text: 'Team', path: '/team' },
+    { id: 'awards', icon: awardsIcon, text: 'Awards', path: '/awards' },
+  ];
+
+  const profileItems = [
+    { id: 'profile', icon: profileIcon, text: 'Profile', path: '/profile' },
+    { id: 'setting', icon: settingIcon, text: 'Setting', path: '/setting' },
   ];
 
   return (
@@ -138,7 +152,7 @@ function Sidebar() {
             <div className="chat-input">
               <input
                 type="text"
-                placeholder="Type Message Here!"
+                placeholder="Type Message Here !"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -148,6 +162,31 @@ function Sidebar() {
             <div className="chat-arrow"></div>
           </div>
         )}
+
+        <div className="divider"></div>
+
+        <ul>
+          {profileItems.map((item) => (
+            <li
+              key={item.id}
+              className={activeItem === item.id ? 'active' : ''}
+            >
+              <Link 
+                to={item.path} 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  textDecoration: 'none', 
+                  color: 'inherit',
+                  padding: '10px'
+                }}
+              >
+                <img src={item.icon} alt={item.text} className="list-icon" />
+                <span>{item.text}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </nav>
     </div>
   );

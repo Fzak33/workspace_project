@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './Sidebar.css';
 import { useNavigate } from 'react-router-dom';
 
-
 function Sidebar() {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState('Dashboard');
@@ -10,31 +9,31 @@ function Sidebar() {
 
   const toggleEmployeesMenu = () => {
     setIsEmployeesOpen(!isEmployeesOpen);
-  
+
     if (!isEmployeesOpen) {
       setActiveItem('Manage Employees');
-      navigate('/employees'); // انتبه هنا تصحح المسار
+      navigate('/hr/employees'); // ✅ تم التعديل هنا
     }
   };
-  
+
   const handleItemClick = (item) => {
     setActiveItem(item);
     if (item === 'Manage Employees') {
-      navigate('/employees');
+      navigate('/hr/employees');
     } else if (item === 'Dashboard') {
-      navigate('/dashboard');
+      navigate('/hr/dashboard');
     } else if (item === 'Attendance') {
-      navigate('/attendance');
+      navigate('/hr/attendance');
     } else if (item === 'Time-off') {
-      navigate('/time-off');
+      navigate('/hr/time-off');
     } else if (item === 'Finance') {
-      navigate('/finance');
+      navigate('/hr/finance');
     } else if (item === 'Settings') {
-      navigate('/settings');
+      navigate('/hr/settings'); // تأكد أن هذا المسار موجود أو احذفه إذا غير مستخدم
     } else if (item === 'Profile') {
-      navigate('/profile');
+      navigate('/hr/profile');  // تأكد أن هذا المسار موجود أو احذفه إذا غير مستخدم
     } else if (item === 'Department') {
-      navigate('/departments');
+      navigate('/hr/departments');
     }
   };
 
