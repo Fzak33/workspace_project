@@ -1,8 +1,8 @@
-// Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Optional styling
-import { Employee} from './models/employee-model';
+import './Login.css';
+import logo from "./assets/login.png";
+import rightImage from "./assets/back.png"; 
 
 function Login() {
   const navigate = useNavigate();
@@ -14,71 +14,82 @@ function Login() {
     e.preventDefault();
     setErrorMsg('');
 
-     try {
-    const response = await fetch('http://localhost:3000/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const text = await response.text();
-    let data;
-
     try {
-      data = JSON.parse(text);
-    } catch (err) {
-      console.error('Invalid JSON:', err);
-      setErrorMsg('Invalid response from server.');
-      return;
-    }
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (response.ok && data.role) {
+      const data = await response.json();
 
-      const employee = Employee.fromJson(data);
+      if (response.ok && data.role) {
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('token', data.token);
 
-  // Optional: store employee in localStorage (use JSON.stringify)
-  localStorage.setItem('employee', JSON.stringify(employee.toJson()));
-      // Store role in localStorage
-      localStorage.setItem('role', data.role); // Store role
- localStorage.setItem('token', data.token); 
-      // Redirect based on role
-      if (data.role === 'hr manager') {
-        navigate('/hr/dashboard'); // HR app
-      } else if (data.role === 'employee') {
-        navigate('/employee'); // Employee app
+        if (data.role === 'hr manager') {
+          navigate('/hr/dashboard');
+        } else if (data.role === 'employee') {
+          navigate('/employee');
+        } else {
+          setErrorMsg('Invalid role.');
+        }
       } else {
-        setErrorMsg('Invalid role.');
+        setErrorMsg(data.message || 'Invalid credentials.');
       }
-    } else {
-      setErrorMsg(data.message || 'Invalid credentials.');
+    } catch (err) {
+      setErrorMsg('Something went wrong. Try again.');
     }
-  } catch (err) {
-    console.error('Login error:', err);
-    setErrorMsg('Something went wrong. Try again.');
-  }
   };
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleLogin}>
-        <h2>Login</h2>
-        {errorMsg && <p className="error-msg">{errorMsg}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Sign In</button>
-      </form>
+    <div className="login-page">
+      <div className="left-section">
+        <img src={logo} alt="Logo" className="logo" />
+        <h2>Welcome Back <span>!</span></h2>
+        {errorMsg && <div className="error-msg">{errorMsg}</div>}
+        <form className="login-form" onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Login</button>
+          <div className="help-links">
+            <span>Forgot your password?</span>
+            <span>Need help? <strong>Contact support</strong></span>
+          </div>
+        </form>
+        <div className="new-employee">
+          New Employee? <span>Click Here</span>
+        </div>
+        <footer>
+          <span>About Workspace HR</span> | 
+          <span>Features</span> | 
+          <span>Pricing</span> | 
+          <span>Blog</span> | 
+          <span>Contact us</span>
+          <div className="social-icons">
+            <i className="fab fa-facebook"></i>
+            <i className="fab fa-x-twitter"></i>
+            <i className="fab fa-instagram"></i>
+            <i className="fab fa-linkedin"></i>
+          </div>
+        </footer>
+      </div>
+
+      <div className="right-section">
+        <img src={rightImage} alt="Visual" />
+      </div>
     </div>
   );
 }

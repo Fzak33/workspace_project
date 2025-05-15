@@ -1,7 +1,6 @@
 const Employee = require("../model/employee");
 const {leaveRequest} = require('../model/leaveRequest');
 const isAuth = require('../socket-middleware/is-auth');
-
 const employeeSocket = (io) => {
     io.of("/employee").use(isAuth).on("connection",(socket)=>{
         console.log('Admin connected:', socket.employee.id);

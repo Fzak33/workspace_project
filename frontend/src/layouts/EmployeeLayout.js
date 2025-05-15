@@ -1,7 +1,6 @@
 import React from 'react';
 import Sidebar from '../employee/Pages/Dashboard/components/Sidebar/Sidebar';
-import './Layout.css'; // تم تصحيح مسار الـ CSS
-
+import './Layout.css'; 
 function EmployeeLayout({ children }) {
   return (
     <div className="employee-layout">
