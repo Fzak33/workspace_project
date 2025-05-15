@@ -44,6 +44,10 @@ const employeeSchema =  new Schema({
         type:Number,
         required: true,
     },
+     points: {
+type: Number,
+default:0
+    },
    status: {
 type: Number,
 default:0
