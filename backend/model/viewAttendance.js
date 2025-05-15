@@ -3,23 +3,21 @@ const Schema = mongoose.Schema;
 
 const viewAttendance =  new Schema({
     monthlyAttendance: {
-        type: String,
+        type: Number,
         required: true
     },
-    dateRangeFilter: {
-        type: String,
-        required: true,
-    },
+  
     absentDays: {
         type: Number,
     },
    
-    workingHours: {
-        type: Number,
-        default:0
-    },
+    workingHours:[ {
+        type: Date,
+    }],
    
 
 });
+
+
 
 module.exports = viewAttendance;

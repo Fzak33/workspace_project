@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const hrMangRoute = require('./routes/hr-manager-rt');
 const authRoute = require('./routes/auth-rt');
+const employeeRoute = require('./routes/employee-rt');
 const http = require('http');
 const employeeSocket = require("./socket-contorller/employee");
 const HrSocket = require("./socket-contorller/hr-manager");
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 
 app.use('/hr-manager',hrMangRoute);
 app.use('/auth',authRoute);
+app.use('/employee',employeeRoute);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;

@@ -298,3 +298,40 @@ catch (err) {
   next(err); 
 }
     };
+
+
+    exports.getTodayWorkingEmployees = async (req, res, next) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1); // Start of tomorrow
+
+    const employees = await Employee.find({
+      workingHours: {
+        $elemMatch: {
+          $gte: today,
+          $lt: tomorrow
+        }
+      }
+    });
+
+    // Optional: format output to show number of working entries today per employee
+    const result = employees.map(emp => {
+      const todayEntries = emp.workingHours.filter(date => {
+        return date >= today && date < tomorrow;
+      });
+
+      return {
+        _id: emp._id,
+        name: emp.name, // assuming there is a name field
+        totalEntriesToday: todayEntries.length
+      };
+    });
+
+    return res.json(result);
+  } catch (err) {
+    if (!err.statusCode) err.statusCode = 500;
+    next(err);
+  }
+};

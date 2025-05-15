@@ -48,5 +48,5 @@ const hrManagerController = require('../controller/hr-manager-cn');
 
           hrMang.post('/manage-department', hrManagerAuth,hrManagerController.manageDepartment);
 
-
+        hrMang.get('/get-workeing-hours-employess',hrManagerAuth,hrManagerController.getTodayWorkingEmployees);
         module.exports =  hrMang;
