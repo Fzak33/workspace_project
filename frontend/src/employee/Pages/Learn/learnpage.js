@@ -14,7 +14,7 @@ function LearnPage() {
   return (
 
    <div className='main'>
-     <div className='Sidebar'><Sidebar/></div>
+ 
 
  <div className='Courses2'><Courses/></div>
  <div className='AllStatus'><AllStatus/></div>

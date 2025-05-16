@@ -122,7 +122,7 @@ function TaskPage() {
 
   return (
     <>
-      <Sidebar />
+  
       <div className="tasks-container">
         <div className="tasks-header">
           <h1>Tasks</h1>

@@ -11,7 +11,7 @@ import Sidebar from './components/Sidebar/Sidebar'
 function Dashboard() {
   return (
     <div className="Header">
-      <Sidebar/>
+   
       
   <div className="TaskCss"><Tasks/></div>
   
