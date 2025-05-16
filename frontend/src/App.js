@@ -10,7 +10,7 @@ function App() {
   console.log("Role from localStorage:", role); // Debugging line
 
   return (
-    <Routes> 
+    <Routes>
       <Route 
         path="/" 
         element={
