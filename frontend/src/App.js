@@ -11,20 +11,7 @@ function App() {
 
   return (
     <Routes>
-      <Route 
-        path="/" 
-        element={
-          role === 'hr manager' ? (
-            <Navigate to="/hr/dashboard" />
-          ) : role === 'employee' ? (
-            <Navigate to="/employee" />
-          ) : (
-            <Navigate to="/login" />
-          )
-        } 
-      />
-      <Route path="/login" element={<Login />} />
-      <Route path="/hr/*" element={<HRApp />} />
+     
       <Route path="/employee/*" element={<EmployeeApp />} />
     </Routes>
   );
