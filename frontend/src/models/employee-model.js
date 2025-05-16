@@ -1,5 +1,6 @@
 // models/Employee.js
 import { LeaveRequest } from './leave-request-model';
+import { ViewAttendance } from './view-attendence';
 
 export class Employee {
   constructor({
@@ -15,6 +16,7 @@ export class Employee {
     salary = 0,
     status = 0,
     leaveRequest = {},
+    viewAttendance = {},
     role = '',
     gender = '',
   } = {}) {
@@ -30,6 +32,7 @@ export class Employee {
     this.salary = salary;
     this.status = status;
     this.leaveRequest = new LeaveRequest(leaveRequest);
+    this.viewAttendance = new ViewAttendance(viewAttendance);
     this.role = role;
     this.gender = gender;
   }
@@ -52,6 +55,7 @@ export class Employee {
       salary: this.salary,
       status: this.status,
       leaveRequest: this.leaveRequest.toJson(),
+      viewAttendance: this.viewAttendance.toJson(), 
       role: this.role,
       gender: this.gender,
     };
