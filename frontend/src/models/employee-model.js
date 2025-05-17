@@ -25,12 +25,12 @@ export class Employee {
     this.email = email;
     this.password = password;
     this.department = department;
-    this.position = position;
+    this.position = this.formatPosition(position); // ✅ تحسين المسمى الوظيفي
     this.phoneNumber = phoneNumber;
     this.dateOfBirth = new Date(dateOfBirth);
     this.loginCredentials = loginCredentials;
     this.salary = salary;
-    this.status = status;
+    this.status = this.convertStatus(status); // ✅ تحويل الحالة لنص قابل للعرض
     this.leaveRequest = new LeaveRequest(leaveRequest);
     this.viewAttendance = new ViewAttendance(viewAttendance);
     this.role = role;
@@ -55,9 +55,41 @@ export class Employee {
       salary: this.salary,
       status: this.status,
       leaveRequest: this.leaveRequest.toJson(),
-      viewAttendance: this.viewAttendance.toJson(), 
+      viewAttendance: this.viewAttendance.toJson(),
       role: this.role,
       gender: this.gender,
     };
+  }
+
+  // ✅ تحويل حالة الموظف إلى نص واضح
+  convertStatus(status) {
+    switch (status) {
+      case 0:
+        return 'Active';
+      case 1:
+        return 'On Leave';
+      case 2:
+        return 'Inactive';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  // ✅ تنسيق المسمى الوظيفي بدون كلمة "manager" إن لزم
+  formatPosition(position) {
+    if (!position) return 'Employee';
+    const cleaned = position.replace(/manager/gi, '').trim();
+    return cleaned || 'Employee';
+  }
+
+  // ✅ دالة لحساب العمر
+  getAge() {
+    const today = new Date();
+    let age = today.getFullYear() - this.dateOfBirth.getFullYear();
+    const m = today.getMonth() - this.dateOfBirth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < this.dateOfBirth.getDate())) {
+      age--;
+    }
+    return age;
   }
 }

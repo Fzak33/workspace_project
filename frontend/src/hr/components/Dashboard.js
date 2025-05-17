@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
+import { useNavigate } from 'react-router-dom';
+
 
 function Dashboard({ setActivePage }) {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -34,6 +36,18 @@ function Dashboard({ setActivePage }) {
   const [isAddingEvent, setIsAddingEvent] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState('');
+  const [isPaused, setIsPaused] = useState(false);
+  
+
+  const [pauseStartTime, setPauseStartTime] = useState(null);
+  const [totalPausedTime, setTotalPausedTime] = useState(0);
+const [finalElapsedTime, setFinalElapsedTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
+
+
+
+const navigate = useNavigate();
+
+  
 
   
   
@@ -205,24 +219,20 @@ function Dashboard({ setActivePage }) {
     setIsDatePickerOpen(false);
   };
 
-  const handleClockInOut = () => {
-    if (!isClockedIn) {
-      setIsClockedIn(true);
-      setClockInTime(new Date());
-    } else {
-      setClockOutTime(new Date());
-      setShowClockOutModal(true);
-    }
-  };
 
   const calculateElapsedTime = () => {
-    if (!clockInTime || !clockOutTime) return { hours: 0, minutes: 0, seconds: 0 };
-    const diff = clockOutTime - clockInTime;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return { hours, minutes, seconds };
-  };
+  if (!clockInTime) return { hours: 0, minutes: 0, seconds: 0 };
+
+  const endTime = isPaused ? pauseStartTime : new Date();
+  const diff = endTime - clockInTime - totalPausedTime;
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  return { hours, minutes, seconds };
+};
+
 
   const getPaginatedData = (data, page) => {
     const start = (page - 1) * itemsPerPage;
@@ -231,15 +241,39 @@ function Dashboard({ setActivePage }) {
   };
 
 
-  const handleClockOut = () => {
-    const { hours, minutes, seconds } = calculateElapsedTime();
-    setClockOutMessage(`You worked for ${hours}h ${minutes}m ${seconds}s${clockOutModalNote ? ' with note: "' + clockOutModalNote + '"' : ''}. This will be sent to the HR manager.`);
-    setIsClockedIn(false);
-    setClockInTime(null);
-    setClockOutTime(null);
-    setClockOutModalNote('');
-    setShowClockOutModal(false);
-  };
+  const handleClockInOut = () => {
+  if (!isClockedIn) {
+    setIsClockedIn(true);
+    setClockInTime(new Date());
+    setClockOutTime(null); // ⬅️ Reset Last Out when starting a new Clock In session
+  } else {
+    setClockOutTime(new Date());
+    const elapsed = calculateElapsedTime(); 
+    setFinalElapsedTime(elapsed);
+    setShowClockOutModal(true);
+  }
+};
+
+
+const handleClockOut = () => {
+  const { hours, minutes, seconds } = finalElapsedTime;
+  setClockOutMessage(`You worked for ${hours}h ${minutes}m ${seconds}s${clockOutModalNote ? ' with note: "' + clockOutModalNote + '"' : ''}. This will be sent to the HR manager.`);
+
+  setIsClockedIn(false);
+  setClockOutTime(new Date()); // ✅ احتفظ بآخر وقت للـ Clock Out بدلاً من null
+  setClockOutModalNote('');
+  setShowClockOutModal(false);
+
+  // لا تقوم بإعادة تعيين Clock In Time
+  // احتفظ بها حتى تظهر بجانب First In
+
+  setIsPaused(false);
+  setPauseStartTime(null);
+  setTotalPausedTime(0);
+};
+
+
+
 
   const handleApprove = (emp) => {
     alert(`Approved: ${emp.name}`);
@@ -373,7 +407,7 @@ function Dashboard({ setActivePage }) {
 
               <div className="pending-title-row">
               <div className="pending-title">Time-off</div>
-              <button className="view-all-btn" onClick={() => setShowTimeOffModal(true)}>View all</button>
+<button className="view-all-btn" onClick={() => navigate('/hr/time-off')}>View all</button>
                         </div>   
                         <div className="pending-count">{pendingTimeOff.length} pending</div>
 
@@ -415,7 +449,7 @@ function Dashboard({ setActivePage }) {
               <div className="pending-title-row">
   <div className="pending-title">Time Attendance</div>
 
-<button className="view-all-btn" onClick={() => setActivePage('Attendance')}>View all</button>
+<button className="view-all-btn" onClick={() => navigate('/hr/attendance')}>View all</button>
 </div>
 <div className="pending-count">{pendingAttendance.length} pending</div>
   
@@ -463,7 +497,7 @@ function Dashboard({ setActivePage }) {
 
         {/* العمود الأيمن */}
         <div className="right-column">
-          <div className="clock-container">
+          <div className="Dashboard-clock-container">
             <div className="clock-header">
               <h2>Clock In/Out</h2>
               <div className="current-time">
@@ -472,7 +506,7 @@ function Dashboard({ setActivePage }) {
             </div>
             <div className="clock-details">
               <div className="time-row"><span>First In</span><span>{clockInTime ? clockInTime.toLocaleTimeString() : '--:--:--'}</span></div>
-              <div className="time-row"><span>Last Out</span><span>{isClockedIn || !clockInTime ? '--:--:--' : new Date().toLocaleTimeString()}</span></div>
+<div className="time-row"><span>Last Out</span><span>{clockOutTime ? clockOutTime.toLocaleTimeString() : '--:--:--'}</span></div>
             </div>
             <button className={`clock-button ${isClockedIn ? 'clocked-in' : ''}`} onClick={handleClockInOut}>
               {isClockedIn ? <>Clock Out <span className="arrow left-arrow">▶</span></> : <>Clock In <span className="arrow right-arrow">▶</span></>}
@@ -539,9 +573,31 @@ function Dashboard({ setActivePage }) {
             </div>
             <textarea placeholder="Note (Optional)" value={clockOutModalNote} onChange={(e) => setClockOutModalNote(e.target.value)} className="note-input" />
             <div className="modal-buttons">
-              <button onClick={() => setShowClockOutModal(false)}>Cancel</button>
-              <button onClick={handleClockOut}>Clock Out</button>
-            </div>
+  <button onClick={() => setShowClockOutModal(false)}>Cancel</button>
+  <button onClick={handleClockOut}>Clock Out</button>
+  {!isPaused ? (
+    <button onClick={() => {
+      setIsPaused(true);
+      setPauseStartTime(new Date());
+    }}>
+      Pause
+    </button>
+  ) : (
+    <button onClick={() => {
+      setIsPaused(false);
+      if (pauseStartTime) {
+        const pauseDuration = new Date() - pauseStartTime;
+        setTotalPausedTime(prev => prev + pauseDuration);
+        setPauseStartTime(null);
+      }
+      setShowClockOutModal(false);
+    }}>
+      Resume
+    </button>
+  )}
+</div>
+
+
           </div>
         </>
       )}

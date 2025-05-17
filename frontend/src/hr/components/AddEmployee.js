@@ -87,11 +87,12 @@ function AddEmployee() {
       email: formData.email,
       password: formData.password,
       department: formData.department,
-      position: formData.jobTitle,
+      position: formData.jobTitle.replace(/manager/gi, '').trim(), // ✅ حذف كلمة manager من المسمى الوظيفي
       gender: formData.gender.toLowerCase(),
       salary: Number(formData.salary),
       phoneNumber: formData.phoneNumber,
       dateOfBirth: formData.dateOfBirth, // ✅
+      role: 'employee',
 
     };
   
@@ -140,7 +141,7 @@ function AddEmployee() {
       email: formData.email,
       name: formData.fullName,
       department: formData.department,
-      position: formData.jobTitle,
+      position: formData.jobTitle.replace(/manager/gi, '').trim(), // ✅ حذف كلمة manager من المسمى الوظيفي
       salary: Number(formData.salary),
       phoneNumber: formData.phoneNumber,
       status: formData.status,
@@ -423,7 +424,9 @@ const matchesSearch = (emp.fullName || emp.name || '').toLowerCase().includes(se
               {emp.status}
                 </span>
               </td>
-              <td>{emp.jobTitle}</td>
+                       <td>{emp.position?.toLowerCase() === 'manager' ? 'Manager' : emp.jobTitle}</td>
+
+
               <td>{emp.department}</td>
               <td>
                 <span className="action-icon" onClick={() => handleEditEmployee(emp)}>✏️</span>
@@ -493,15 +496,18 @@ const matchesSearch = (emp.fullName || emp.name || '').toLowerCase().includes(se
           <option value="Inactive">Inactive</option>
         </select>
         <input type="number" name="salary" placeholder="Salary" value={formData.salary || ''} onChange={handleInputChange} />
+
         <select name="jobTitle" value={formData.jobTitle} onChange={handleInputChange}>
-          <option value="">Select Job Title</option>
-          <option value="Finance Manager">Finance Manager</option>
-          <option value="HR Manager">HR Manager</option>
-          <option value="IT Help-desk">IT Help-desk</option>
-          <option value="Account Manager">Account Manager</option>
-          <option value="Admin Manager">Admin Manager</option>
-          <option value="Account Executive">Account Executive</option>
-        </select>
+  <option value="">Select Job Title</option>
+  <option value="Finance">Finance</option>
+  <option value="HR">HR</option>
+  <option value="IT Help-desk">IT Help-desk</option>
+  <option value="Account">Account</option>
+  <option value="Admin">Admin</option>
+  <option value="Account Executive">Account Executive</option>
+</select>
+
+
         <select name="department" value={formData.department} onChange={handleInputChange}>
           <option value="">Select Department</option>
           <option value="IT">IT</option>
@@ -566,14 +572,15 @@ const matchesSearch = (emp.fullName || emp.name || '').toLowerCase().includes(se
         </select>
         <input type="number" name="salary" placeholder="Salary" value={formData.salary} onChange={handleInputChange} />
         <select name="jobTitle" value={formData.jobTitle} onChange={handleInputChange}>
-          <option value="">Select Job Title</option>
-          <option value="Finance Manager">Finance Manager</option>
-          <option value="HR Manager">HR Manager</option>
-          <option value="IT Help-desk">IT Help-desk</option>
-          <option value="Account Manager">Account Manager</option>
-          <option value="Admin Manager">Admin Manager</option>
-          <option value="Account Executive">Account Executive</option>
-        </select>
+  <option value="">Select Job Title</option>
+  <option value="Finance">Finance</option>
+  <option value="HR">HR</option>
+  <option value="IT Help-desk">IT Help-desk</option>
+  <option value="Account">Account</option>
+  <option value="Admin">Admin</option>
+  <option value="Account Executive">Account Executive</option>
+</select>
+
         <select name="department" value={formData.department} onChange={handleInputChange}>
           <option value="">Select Department</option>
           <option value="IT">IT</option>

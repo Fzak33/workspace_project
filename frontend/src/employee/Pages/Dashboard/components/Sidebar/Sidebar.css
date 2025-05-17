@@ -1,5 +1,5 @@
 /* Sidebar.css */
-.sidebar {
+.dashboard-sidebar {
   width: 250px;
   height: 100vh;
   background-color: #ffffff; /* لون خلفية الشريط الجانبي */
@@ -46,12 +46,12 @@
   cursor: pointer;
 }
 
-.sidebar-nav ul {
+.dashboard-sidebar ul {
   list-style-type: none;
   padding: 0;
 }
 
-.sidebar-nav li {
+.dashboard-sidebar li {
   display: flex;
   align-items: center;
   margin: 15px 0;
@@ -62,12 +62,12 @@
   position: relative; /* لإضافة المؤشر */
 }
 
-.sidebar-nav li.active {
+.dashboard-sidebar li.active {
   background-color: #f3e0e0; /* لون خلفية العنصر النشط */
   width: 250px;
 }
 
-.sidebar-nav li.active::before {
+.dashboard-sidebar li.active::before {
   content: '';
   position: absolute;
   left: -20px;
@@ -79,7 +79,7 @@
   border-radius: 2px;
 }
 
-.sidebar-nav li:hover {
+.dashbaord-sidebar-nav li:hover {
   background-color: #dccbcb; /* لون الخلفية عند التحويم */
   width: 250px;
 }
@@ -217,7 +217,7 @@
 }
 
 /* تحسين عرض عناصر القائمة لتغطية كامل المساحة */
-.sidebar-nav li a {
+.dashboard-sidebar-nav li a {
   display: flex;
   align-items: center;
   text-decoration: none;

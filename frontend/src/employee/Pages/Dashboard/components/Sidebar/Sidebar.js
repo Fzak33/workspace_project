@@ -31,7 +31,6 @@ function Sidebar() {
 
   const handleSendMessage = async () => {
     if (message.trim() === '') return;
-
     setChatMessages([...chatMessages, { text: message, sender: 'user' }]);
     setMessage('');
 
@@ -76,7 +75,7 @@ function Sidebar() {
   ];
 
   return (
-    <div className="sidebar">
+    <div className="dashboard-sidebar">
       <div className="user-info">
         <img src={userImage} alt="User" className="user-image" />
         <div>
@@ -87,7 +86,7 @@ function Sidebar() {
         <div className="more-icon">...</div>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="dashboard-sidebar-nav">
         <ul>
           {navigationItems.map((item) => (
             <li

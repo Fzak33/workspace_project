@@ -4,11 +4,39 @@ import { saveAs } from 'file-saver';
 
 import './Finance.css';
 
+import { useEffect } from 'react';
+
+
 function Finance() {
   const [showModal, setShowModal] = useState(false);
+
+   const [employees, setEmployees] = useState([]);
+
+useEffect(() => {
+  const fetchEmployees = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:3000/hr-manager/get-employees', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setEmployees(data);
+      }
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
+  };
+
+  fetchEmployees();
+}, []);
+
+
   const [records, setRecords] = useState([
-    { employee: 'Ahmed Ali', type: 'Salary', amount: 1200, date: '2025-05-01' },
-    { employee: 'Sara Khaled', type: 'Bonus', amount: 300, date: '2025-05-03' },
+
   ]);
   const [formData, setFormData] = useState({ employee: '', type: '', amount: '', date: '' });
   const [message, setMessage] = useState('');
@@ -19,20 +47,67 @@ function Finance() {
   const [filterPeriod, setFilterPeriod] = useState('All Time');
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { name, value } = e.target;
 
-  const handleAdd = () => {
-    if (!formData.employee || !formData.type || !formData.amount || !formData.date) {
-      setMessage('❌ All fields are required');
-      return;
+  if (name === 'employee') {
+    const selectedEmp = employees.find(emp => emp.name === value);
+    setFormData({
+      ...formData,
+      employee: value,
+      type: 'Salary', // النوع يصبح تلقائي Salary
+      amount: selectedEmp ? selectedEmp.salary : ''
+    });
+  } else if (name === 'type') {
+    setFormData({
+      ...formData,
+      type: value,
+      amount: value === 'Salary' 
+        ? (() => {
+            const selectedEmp = employees.find(emp => emp.name === formData.employee);
+            return selectedEmp ? selectedEmp.salary : '';
+          })() 
+        : 0 // إذا اختار Bonus أو Deduction يتم تعيين 0 تلقائيًا
+    });
+  } else {
+    setFormData({ ...formData, [name]: value });
+  }
+};
+
+
+
+  const handleAdd = async () => {
+  if (!formData.employee || !formData.type || !formData.amount || !formData.date) {
+    setMessage('❌ All fields are required');
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch('http://localhost:3000/finance/add-record', { // تأكد من وجود هذا الـ Endpoint
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      setRecords([...records, result]);
+      setFormData({ employee: '', type: '', amount: '', date: '' });
+      setShowModal(false);
+      setMessage('✅ Record added successfully');
+      setTimeout(() => setMessage(''), 3000);
+    } else {
+      const errorData = await response.json();
+      setMessage(`❌ ${errorData.message || 'Failed to add record'}`);
     }
-    setRecords([...records, formData]);
-    setFormData({ employee: '', type: '', amount: '', date: '' });
-    setShowModal(false);
-    setMessage('✅ Record added successfully');
-    setTimeout(() => setMessage(''), 3000);
-  };
+  } catch (error) {
+    setMessage('❌ Server error: ' + error.message);
+  }
+};
+
 
   const filterByPeriod = (record) => {
     const today = new Date();
@@ -149,7 +224,15 @@ function Finance() {
               <h3>Add Finance Record</h3>
             </div>
             <div className="modal-body">
-              <input name="employee" value={formData.employee} onChange={handleChange} placeholder="Employee Name" />
+              <select name="employee" value={formData.employee} onChange={handleChange}>
+  <option value="">Select Employee</option>
+  {employees.map((emp) => (
+    <option key={emp.email} value={emp.name}>
+      {emp.name}
+    </option>
+  ))}
+</select>
+
               <select name="type" value={formData.type} onChange={handleChange}>
                 <option value="">Select Type</option>
                 <option value="Salary">Salary</option>
