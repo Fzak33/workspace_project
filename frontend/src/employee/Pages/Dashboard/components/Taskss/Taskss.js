@@ -38,7 +38,7 @@ function Taskss() {
   };
 
   return (
-    <div className="tasks-container">
+    <div className="dashboard-tasks-container">
       <h2 className="tasks-title">Tasks</h2>
       
       {/* Message display */}

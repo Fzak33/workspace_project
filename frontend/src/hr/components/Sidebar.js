@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeItem, setActiveItem] = useState('Dashboard');
   const [isEmployeesOpen, setIsEmployeesOpen] = useState(false);
 
   const toggleEmployeesMenu = () => {
     setIsEmployeesOpen(!isEmployeesOpen);
-
     if (!isEmployeesOpen) {
       setActiveItem('Manage Employees');
-      navigate('/hr/employees'); // ✅ تم التعديل هنا
+      navigate('/hr/employees');
     }
   };
 
@@ -29,22 +29,42 @@ function Sidebar() {
     } else if (item === 'Finance') {
       navigate('/hr/finance');
     } else if (item === 'Settings') {
-      navigate('/hr/settings'); // تأكد أن هذا المسار موجود أو احذفه إذا غير مستخدم
+      navigate('/hr/settings');
     } else if (item === 'Profile') {
-      navigate('/hr/profile');  // تأكد أن هذا المسار موجود أو احذفه إذا غير مستخدم
+      navigate('/hr/profile');
     } else if (item === 'Department') {
       navigate('/hr/departments');
     }
   };
 
+  // ✅ Sync active item with current URL path
+  useEffect(() => {
+    if (location.pathname.includes('/hr/dashboard')) {
+      setActiveItem('Dashboard');
+    } else if (location.pathname.includes('/hr/employees')) {
+      setActiveItem('Manage Employees');
+      setIsEmployeesOpen(true);
+    } else if (location.pathname.includes('/hr/departments')) {
+      setActiveItem('Department');
+      setIsEmployeesOpen(true);
+    } else if (location.pathname.includes('/hr/attendance')) {
+      setActiveItem('Attendance');
+    } else if (location.pathname.includes('/hr/time-off')) {
+      setActiveItem('Time-off');
+    } else if (location.pathname.includes('/hr/finance')) {
+      setActiveItem('Finance');
+    } else if (location.pathname.includes('/hr/settings')) {
+      setActiveItem('Settings');
+    } else if (location.pathname.includes('/hr/profile')) {
+      setActiveItem('Profile');
+    }
+  }, [location.pathname]);
+
   return (
     <div className="sidebar">
       <div className="main-menu">
         <ul>
-          <li
-            className={activeItem === 'Dashboard' ? 'active' : ''}
-            onClick={() => handleItemClick('Dashboard')}
-          >
+          <li className={activeItem === 'Dashboard' ? 'active' : ''} onClick={() => handleItemClick('Dashboard')}>
             <span className="icon">📊</span>
             <span className="text">Dashboard</span>
           </li>
@@ -74,24 +94,15 @@ function Sidebar() {
               </ul>
             )}
           </li>
-          <li
-            className={activeItem === 'Attendance' ? 'active' : ''}
-            onClick={() => handleItemClick('Attendance')}
-          >
+          <li className={activeItem === 'Attendance' ? 'active' : ''} onClick={() => handleItemClick('Attendance')}>
             <span className="icon">⏰</span>
             <span className="text">Attendance</span>
           </li>
-          <li
-            className={activeItem === 'Time-off' ? 'active' : ''}
-            onClick={() => handleItemClick('Time-off')}
-          >
+          <li className={activeItem === 'Time-off' ? 'active' : ''} onClick={() => handleItemClick('Time-off')}>
             <span className="icon">🏖️</span>
             <span className="text">Time-off</span>
           </li>
-          <li
-            className={activeItem === 'Finance' ? 'active' : ''}
-            onClick={() => handleItemClick('Finance')}
-          >
+          <li className={activeItem === 'Finance' ? 'active' : ''} onClick={() => handleItemClick('Finance')}>
             <span className="icon">💰</span>
             <span className="text">Finance</span>
           </li>
@@ -99,17 +110,11 @@ function Sidebar() {
       </div>
       <div className="bottom-menu">
         <ul>
-          <li
-            className={activeItem === 'Settings' ? 'active' : ''}
-            onClick={() => handleItemClick('Settings')}
-          >
+          <li className={activeItem === 'Settings' ? 'active' : ''} onClick={() => handleItemClick('Settings')}>
             <span className="icon">⚙️</span>
             <span className="text">Settings</span>
           </li>
-          <li
-            className={activeItem === 'Profile' ? 'active' : ''}
-            onClick={() => handleItemClick('Profile')}
-          >
+          <li className={activeItem === 'Profile' ? 'active' : ''} onClick={() => handleItemClick('Profile')}>
             <span className="icon">👤</span>
             <span className="text">Profile</span>
           </li>

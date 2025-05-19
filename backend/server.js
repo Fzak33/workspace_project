@@ -29,12 +29,20 @@ app.use('/task', express.static(path.join(__dirname, 'task')));
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
+
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*'); // اسمح لكل المصادر تتصل
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE'); // حدد الميثودات المسموحة
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-auth-token'); // السماح بالهيدر مثل التوكين
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS'); // ✅ أضفنا OPTIONS
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-auth-token');
+  
+  // ✅ تعامل مع طلبات الـ OPTIONS مباشرة لتفادي مشاكل CORS
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
   next();
 });
+
 
 app.use('/hr-manager',hrMangRoute);
 app.use('/auth',authRoute);

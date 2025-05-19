@@ -49,7 +49,7 @@ exports.addEmployee = async (req, res, next) => {
       position: position, // هون صار تعديل على الاسم
       name: name,
       dateOfBirth, // ✅ أضفنا هنا
-      role: 'hr manager' // ✅ 
+      role: req.body.role || 'employee'  // ✅ تم التعديل هنا
     });
 
     employee = await employee.save();
@@ -262,29 +262,44 @@ return res.json({ message: 'User deleted successfully' });
     
 
     exports.manageDepartment = async (req, res, next) => {
-      try{
-    const {email, department} = req.body;
-    let employee = await Employee.findOne({email: email});
+  try {
+    const { email, department } = req.body;
+    const employee = await Employee.findOne({ email: email });
 
-    if(!employee){
-      const error = new Error(`there is no one with this email`);
-    error.statusCode = 422;
-    return next(error);
-  };
-  if(department == "HR"){
-    employee.role = "hr manager";
+    if (!employee) {
+      const error = new Error(`There is no employee with this email`);
+      error.statusCode = 422;
+      return next(error);
+    }
+
+    // ✅ تحقق إن كان هناك مدير معين بالفعل لهذا القسم
+    const existingManager = await Employee.findOne({ department: department, position: 'manager' });
+
+    if (existingManager) {
+      const error = new Error(`Department already has a manager assigned: ${existingManager.name}`);
+      error.statusCode = 409; // Conflict
+      return next(error);
+    }
+
+    if (department === "HR") {
+      employee.role = "hr manager";
+    } else {
+      employee.role = "manager";
+    }
+
+    employee.position = "manager";
+    await employee.save();
+
+    return res.json({ message: 'Manager assigned successfully', employee });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
   }
-  employee.position = "manager";
-  return res.json(employee);
+};
 
-      }
-      catch (err) {
-        if (!err.statusCode) {
-          err.statusCode = 500;
-        }
-        next(err); 
-      }
-    };
+
 
     exports.getReq = async (req, res, next) => {
 try{
