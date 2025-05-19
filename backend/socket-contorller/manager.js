@@ -31,7 +31,7 @@ const employeeSocket = (io) => {
                 await employee.save();
 
                     const savedTask = employee.task[employee.task.length - 1];
-                 io.of("/employee").to(employeeId).emit("newTask", savedTask);
+                 io.of("/employee").to(employeeId.toString()).emit("newTask", savedTask);
             callback({ success: true});
             }
             catch(err){

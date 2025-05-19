@@ -2,7 +2,7 @@ const { body } = require('express-validator');
 const express = require('express');
 const hrManagerAuth = require('../middleware/is-hrManager');
 const hrManagerController = require('../controller/hr-manager-cn');
-
+const isEmployee = require("../middleware/is-auth");
     hrMang = express.Router();
 
     hrMang.post('/add-employee',[
@@ -46,7 +46,9 @@ const hrManagerController = require('../controller/hr-manager-cn');
           hrMang.get('/get-request', hrManagerAuth,hrManagerController.getReq);
 
 
-          hrMang.post('/manage-department', hrManagerAuth,hrManagerController.manageDepartment);
+          hrMang.post('/manage-department', hrManagerAuth,hrManagerController.manageDepartment); 
+
+            hrMang.post('/change-to-employee', isEmployee , hrManagerController.changeIntoEmployee);
 
         hrMang.get('/get-workeing-hours-employess',hrManagerAuth,hrManagerController.getTodayWorkingEmployees);
         module.exports =  hrMang;

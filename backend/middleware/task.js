@@ -13,7 +13,7 @@ const fileFilter = (req, file, cb) => {
 // Set up multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'task'); // Save files to 'task' directory
+    cb(null, 'result'); // Save files to 'result' directory
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname); // Add timestamp to avoid name conflicts

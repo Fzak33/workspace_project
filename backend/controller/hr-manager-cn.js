@@ -283,8 +283,6 @@ return res.json({ message: 'User deleted successfully' });
 
     if (department === "HR") {
       employee.role = "hr manager";
-    } else {
-      employee.role = "manager";
     }
 
     employee.position = "manager";
@@ -349,4 +347,27 @@ catch (err) {
     if (!err.statusCode) err.statusCode = 500;
     next(err);
   }
+};
+
+
+exports.changeIntoEmployee = async (req, res, next) => {
+  try{
+let manager = await Employee.findById(req.user);
+if(manager.position !== "manager"){
+      const error = new Error('this employee is not a manager');
+        error.statusCode = 401;
+        throw error;
+}
+manager.position = "employee";
+manager.role = "employee"
+await manager.save();
+
+return res.json(manager);
+  }
+    catch (err){
+        if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+    }   
 };

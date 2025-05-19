@@ -9,11 +9,10 @@ const image  = require("../middleware/employee-image");
     
     employeeRoute.post('/working-hours', isEmployee , employeeController.workingHours);
 
-    employeeRoute.post('/add-task',taskFile.single('task'), isEmployee , employeeController.addTask);
+    employeeRoute.post('/add-task',taskFile.single('result'), isEmployee , employeeController.addTask);
 
     employeeRoute.get('/get-task', isEmployee , employeeController.getTasks);
 
-     employeeRoute.post('/change-to-employee', isEmployee , employeeController.changeIntoEmployee);
 
     employeeRoute.post('/add-image',image.single('images'), isEmployee , employeeController.addEmployeeImage);
 

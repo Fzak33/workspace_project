@@ -25,7 +25,7 @@ const PORT =process.env.PORT || 3000;
 const app = express(); 
 
 
-app.use('/task', express.static(path.join(__dirname, 'task')));
+app.use('/result', express.static(path.join(__dirname, 'result')));
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
