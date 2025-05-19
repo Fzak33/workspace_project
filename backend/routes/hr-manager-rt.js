@@ -48,7 +48,7 @@ const isEmployee = require("../middleware/is-auth");
 
           hrMang.post('/manage-department', hrManagerAuth,hrManagerController.manageDepartment); 
 
-            hrMang.post('/change-to-employee', isEmployee , hrManagerController.changeIntoEmployee);
+            hrMang.post('/change-to-employee', hrManagerAuth , hrManagerController.changeIntoEmployee);
 
         hrMang.get('/get-workeing-hours-employess',hrManagerAuth,hrManagerController.getTodayWorkingEmployees);
         module.exports =  hrMang;

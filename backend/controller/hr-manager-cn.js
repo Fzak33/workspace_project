@@ -352,7 +352,8 @@ catch (err) {
 
 exports.changeIntoEmployee = async (req, res, next) => {
   try{
-let manager = await Employee.findById(req.user);
+    const {managerId} = req.body;
+let manager = await Employee.findById(managerId);
 if(manager.position !== "manager"){
       const error = new Error('this employee is not a manager');
         error.statusCode = 401;
