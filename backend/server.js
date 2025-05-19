@@ -4,9 +4,11 @@ const multer = require("multer");
 const hrMangRoute = require('./routes/hr-manager-rt');
 const authRoute = require('./routes/auth-rt');
 const employeeRoute = require('./routes/employee-rt');
+const managerRoute = require('./routes/manager-rt');
 const http = require('http');
 const employeeSocket = require("./socket-contorller/employee");
 const HrSocket = require("./socket-contorller/hr-manager");
+const managerSocket = require("./socket-contorller/manager");
 const path = require('path');
 require('dotenv').config();
   
@@ -23,6 +25,7 @@ const PORT =process.env.PORT || 3000;
 const app = express(); 
 
 
+app.use('/task', express.static(path.join(__dirname, 'task')));
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use(express.json());
@@ -36,6 +39,8 @@ app.use((req, res, next) => {
 app.use('/hr-manager',hrMangRoute);
 app.use('/auth',authRoute);
 app.use('/employee',employeeRoute);
+app.use('/manager',managerRoute);
+
 
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
@@ -56,6 +61,7 @@ mongoose.connect(MONGODB_URI)
       const io = require('./socket').init(server);
       employeeSocket(io);
       HrSocket(io);
+      managerSocket(io);
     });
   })
   .catch((err) => {

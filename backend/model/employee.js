@@ -3,6 +3,8 @@ const Schema = mongoose.Schema;
 const viewAttdendance = require('./viewAttendance');
 const {leaveRequestSchema} = require('./leaveRequest');
 const feedback = require('./feedback');
+const {TaskSchema} = require("./task");
+
 
 const employeeSchema =  new Schema({
     name: {
@@ -40,6 +42,9 @@ const employeeSchema =  new Schema({
     loginCredentials: {
         type: String,
     },
+      images: {
+        type: String,
+    },
     salary:{
         type:Number,
         required: true,
@@ -56,6 +61,7 @@ default:0
    viewAttdendance:viewAttdendance,
    leaveRequest:leaveRequestSchema,
    feedback:feedback,
+   task:[TaskSchema],
    
     role: {
         type: String,

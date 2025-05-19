@@ -25,7 +25,7 @@ const isManager = async (req,res,next) => {
             .json({ msg: "Token verification failed, authorization denied" });
             const user = await User.findById(verified.id);
 
-            if(user.role !== 'manager' ){
+            if(user.position !== 'manager' ){
               const error = new Error('you are not a manager');
               error.statusCode = 401;
               throw error;
