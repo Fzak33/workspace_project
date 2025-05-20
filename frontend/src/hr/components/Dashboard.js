@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import { Employee } from '../../models/employee-model'; // ✅ حسب مسار موديلك
+
 
 
 function Dashboard({ setActivePage }) {
+  const [employee, setEmployee] = useState(null);
+
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -49,14 +53,22 @@ const navigate = useNavigate();
 
   
 
+
+ useEffect(() => {
+  const stored = localStorage.getItem('employee');
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    const emp = Employee.fromJson(parsed); // ✅ لازم تكون دالة fromJson ترجع كائن Employee صحيح
+    setEmployee(emp);
+    console.log('🟢 Loaded employee from localStorage:', emp); // أضف هذا السطر
+  } else {
+    console.warn('⚠️ No employee data in localStorage');
+  }
+
+  fetchEvents();
+}, []);
+
   
-  
-
-
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
   
   const fetchEvents = async () => {
     const token = localStorage.getItem('token');
@@ -255,22 +267,56 @@ const navigate = useNavigate();
 };
 
 
-const handleClockOut = () => {
+const handleClockOut = async () => {
   const { hours, minutes, seconds } = finalElapsedTime;
+
   setClockOutMessage(`You worked for ${hours}h ${minutes}m ${seconds}s${clockOutModalNote ? ' with note: "' + clockOutModalNote + '"' : ''}. This will be sent to the HR manager.`);
 
   setIsClockedIn(false);
-  setClockOutTime(new Date()); // ✅ احتفظ بآخر وقت للـ Clock Out بدلاً من null
+  setClockOutTime(new Date());
   setClockOutModalNote('');
   setShowClockOutModal(false);
-
-  // لا تقوم بإعادة تعيين Clock In Time
-  // احتفظ بها حتى تظهر بجانب First In
 
   setIsPaused(false);
   setPauseStartTime(null);
   setTotalPausedTime(0);
+
+  const sendWorkingHours = async () => {
+    const token = localStorage.getItem('token');
+    const workingHoursPayload = {
+      workingHours: new Date().toISOString(),
+      _id: employee?._id,
+    };
+
+    console.log('📤 Sending to backend:', workingHoursPayload);
+
+    try {
+      const response = await fetch('http://localhost:3000/employee/working-hours', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: JSON.stringify(workingHoursPayload),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        console.error('❌ Failed to send working hours:', data.message);
+        alert('❌ Error sending working hours: ' + data.message);
+      } else {
+        console.log('✅ Working hours recorded successfully:', data);
+        alert('✅ Working hours saved successfully.');
+      }
+    } catch (error) {
+      console.error('❌ Network error:', error);
+      alert('❌ Network error while sending working hours.');
+    }
+  };
+
+  await sendWorkingHours();
 };
+
 
 
 
@@ -563,44 +609,54 @@ const handleClockOut = () => {
       )}
 
       {showClockOutModal && (
-        <>
-          <div className="modal-overlay" onClick={() => setShowClockOutModal(false)}></div>
-          <div className="clock-out-modal">
-            <h3>Clock out at {clockOutTime.toLocaleTimeString()}</h3>
-            <div className="total-time">
-              <span className="clock-icon">⏰</span>
-              <span>Your total working time up to now is {calculateElapsedTime().hours}h {calculateElapsedTime().minutes}m {calculateElapsedTime().seconds}s</span>
-            </div>
-            <textarea placeholder="Note (Optional)" value={clockOutModalNote} onChange={(e) => setClockOutModalNote(e.target.value)} className="note-input" />
-            <div className="modal-buttons">
-  <button onClick={() => setShowClockOutModal(false)}>Cancel</button>
-  <button onClick={handleClockOut}>Clock Out</button>
-  {!isPaused ? (
-    <button onClick={() => {
-      setIsPaused(true);
-      setPauseStartTime(new Date());
-    }}>
-      Pause
-    </button>
-  ) : (
-    <button onClick={() => {
-      setIsPaused(false);
-      if (pauseStartTime) {
-        const pauseDuration = new Date() - pauseStartTime;
-        setTotalPausedTime(prev => prev + pauseDuration);
-        setPauseStartTime(null);
-      }
-      setShowClockOutModal(false);
-    }}>
-      Resume
-    </button>
-  )}
-</div>
+  <>
+    <div className="modal-overlay" onClick={() => setShowClockOutModal(false)}></div>
+    <div className="clock-out-modal">
+      <h3>Clock out at {clockOutTime.toLocaleTimeString()}</h3>
+      <div className="total-time">
+        <span className="clock-icon">⏰</span>
+        <span>Your total working time up to now is {calculateElapsedTime().hours}h {calculateElapsedTime().minutes}m {calculateElapsedTime().seconds}s</span>
+      </div>
+      <textarea placeholder="Note (Optional)" value={clockOutModalNote} onChange={(e) => setClockOutModalNote(e.target.value)} className="note-input" />
+      <div className="modal-buttons">
+        <button onClick={() => setShowClockOutModal(false)}>Cancel</button>
+     <button onClick={async () => {
+  if (!employee) {
+    console.error('❌ employee is null. Cannot send working hours.');
+    alert('❌ Employee data not loaded.');
+    return;
+  }
+  await handleClockOut();
+  setClockOutMessage('✅ Working hours have been successfully recorded!');
+}}>
+  Clock Out
+</button>
 
+        {!isPaused ? (
+          <button onClick={() => {
+            setIsPaused(true);
+            setPauseStartTime(new Date());
+          }}>
+            Pause
+          </button>
+        ) : (
+          <button onClick={() => {
+            setIsPaused(false);
+            if (pauseStartTime) {
+              const pauseDuration = new Date() - pauseStartTime;
+              setTotalPausedTime(prev => prev + pauseDuration);
+              setPauseStartTime(null);
+            }
+            setShowClockOutModal(false);
+          }}>
+            Resume
+          </button>
+        )}
+      </div>
+    </div>
+  </>
+)}
 
-          </div>
-        </>
-      )}
 
 {showAddEventModal && (
   <>

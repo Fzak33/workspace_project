@@ -3,10 +3,13 @@ import './AddEmployee.css';
 import DrawerDetails from './DrawerDetails';
 import './drawer-details.css';
 import { useEffect } from 'react'; // تأكد أنك مستورد useEffect
+import { Employee } from '../../models/employee-model';
+
 
 
 
 function AddEmployee() {
+    const [employee, setEmployee] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -412,9 +415,14 @@ const matchesSearch = (emp.fullName || emp.name || '').toLowerCase().includes(se
 
 
               <td>
-  <img src={emp.photo} alt={emp.fullName || emp.name || ''} className="employee-photo" />
-  {emp.fullName || emp.name || ''}
-</td>
+
+
+       
+       
+       <img src={employee?.images ? `http://localhost:3000/${employee.images}` : 'https://via.placeholder.com/40'}/>
+                                         
+                               {emp.fullName || emp.name || ''}
+                  </td>
 
 
               <td>{emp.gender}</td>
