@@ -19,24 +19,37 @@ try{
 
 
 exports.workingHours = async (req, res, next) => {
-try{
-   
-const {workingHours, _id} = req.body;
-let employee = await Employee.findById(_id);
+  try {
+    const { workingHours, _id } = req.body;
 
-employee.viewAttdendance.workingHours.push(workingHours);
+    const employee = await Employee.findById(_id);
 
-return res.json(workingHours);
-
-}
- catch (err){
-        if (!err.statusCode) {
-            err.statusCode = 500;
-          }
-          next(err);
+    // Ensure viewAttdendance exists
+    if (!employee.viewAttdendance) {
+      employee.viewAttdendance = { workingHours: [] };
     }
 
+    // Ensure workingHours array exists
+    if (!Array.isArray(employee.viewAttdendance.workingHours)) {
+      employee.viewAttdendance.workingHours = [];
+    }
+
+    // Push new working hour
+    employee.viewAttdendance.workingHours.push({
+      date: workingHours
+    });
+
+    await employee.save(); // Save changes to DB
+
+    return res.json({ workingHours });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
+
 
 
 
