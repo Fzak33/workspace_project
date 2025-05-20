@@ -9,7 +9,7 @@ const workingHourSchema = new Schema({
   },
   hours: {
     type: Number,
-    required: true,
+   // required: true,
   },
 });
 
