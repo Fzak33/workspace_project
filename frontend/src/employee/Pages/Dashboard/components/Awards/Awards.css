@@ -1,0 +1,72 @@
+/* Awards.css - تصغير حجم المكون */
+.awards-component {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.awards-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.awards-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-right: 10px;
+}
+
+.awards-count {
+  font-size: 13px;
+  color: #777;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.awards-count:before {
+  content: "🏆";
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.awards-details {
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.awards-details:hover {
+  text-decoration: underline;
+}
+
+.awards-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  text-align: center;
+}
+
+.promotion-text {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.promotion-date {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}

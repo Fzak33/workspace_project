@@ -1,0 +1,78 @@
+.main {
+  display: grid;
+  grid-template-areas: 
+    "header header header"
+    "courses courses progress"
+    "allstatus allstatus progress"
+    "study overview liveevents"
+    "assignments assignments assignments";
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 0px;
+  background-color: #FFF5F5;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header {
+  grid-area: header;
+}
+
+.Courses2 {
+  grid-area: courses;
+}
+
+.AllStatus {
+  grid-area: allstatus;
+}
+
+.STUDYSTATISTICS {
+  grid-area: study;
+}
+
+.Overview {
+  grid-area: overview;
+}
+
+.Progress {
+  grid-area: progress;
+}
+
+.LiveEvents {
+  grid-area: liveevents;
+}
+
+.Assignments {
+  grid-area: assignments;
+}
+
+/* Common card styles */
+.component-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 15px;
+}
+
+.component-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.view-all-btn {
+  width: 100%;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.view-all-btn:hover {
+  background-color: #ff7875;
+}

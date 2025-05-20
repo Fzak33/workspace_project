@@ -1,0 +1,103 @@
+/* Points.css - تصغير حجم المكون */
+.points-component {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.points-header {
+  padding: 10px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.points-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.points-content {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.points-hexagon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0 15px;
+  flex-shrink: 0;
+}
+
+.points-hexagon {
+  width: 80px; /* تصغير حجم السداسي */
+  height: 90px;
+  background-color: #ff4d4d;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.points-value {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.points-history {
+  margin-bottom: 15px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.points-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.points-item:last-child {
+  border-bottom: none;
+}
+
+.points-activity {
+  font-size: 13px;
+  color: #333;
+}
+
+.points-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #ff4d4d;
+  border-radius: 50%;
+}
+
+.view-all-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: auto;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.view-all-btn:hover {
+  background-color: #ff3333;
+}

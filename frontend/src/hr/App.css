@@ -1,0 +1,50 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffcccc; /* لون أحمر فاتح */
+
+}
+.app {
+  display: flex;
+}
+
+/* ===== Transition Effects ===== */
+.sidebar {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+button, .action-icon, .menu-header {
+  transition: all 0.2s ease;
+}
+
+button:hover, .action-icon:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.modal {
+  transition: opacity 0.3s ease;
+}
+
+.modal-content {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.employee-table tr {
+  transition: background-color 0.2s ease;
+}
+
+.employee-table tr:hover {
+  background-color: rgba(255, 204, 204, 0.1);
+}

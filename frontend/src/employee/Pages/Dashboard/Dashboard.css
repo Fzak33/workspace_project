@@ -1,0 +1,228 @@
+/* Dashboard.css - تصحيح أحجام العناصر والتباعد بينها */
+
+:root {
+  --primary-red: #ff4d4f;
+  --primary-light-pink: #FFF5F5;
+  --primary-dark: #333333;
+  --text-gray: #666666;
+  --light-gray: #f0f0f0;
+  --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --border-radius: 8px;
+  --card-padding: 16px;
+}
+
+/* Base layout */
+.app-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+
+.dashboard-content {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background-color: var(--primary-light-pink);
+
+}
+
+/* Grid Layout - تعديل الحجم والمسافات */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding-bottom: 15px;
+}
+
+/* تعديل حجم كل القطاعات */
+.tasks-section,
+.your-points-section,
+.clock-section,
+.leaderboard-section,
+.courses-section,
+.awards-section {
+  min-height: 0; /* إلغاء الارتفاع الأدنى الزائد */
+}
+
+/* Left column */
+.tasks-section {
+  grid-column: 1;
+  grid-row: 1;
+  height: auto;
+}
+
+.your-points-section {
+  grid-column: 1;
+  grid-row: 2;
+  height: auto;
+}
+
+/* Right column */
+.clock-section {
+  grid-column: 2;
+  grid-row: 1;
+  height: auto;
+}
+
+.leaderboard-section {
+  grid-column: 2;
+  grid-row: 2;
+  height: auto;
+}
+
+.courses-section {
+  grid-column: 2;
+  grid-row: 3;
+  height: auto;
+}
+
+/* Awards row - spans full width */
+.awards-section {
+  grid-column: 1 / 3;
+  grid-row: 4;
+  height: auto;
+}
+
+/* Card Styling - تحجيم أصغر */
+.dashboard-grid-item {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  display: block; /* ✅ الحل النهائي */
+}
+
+
+/* عناوين الأقسام - أصغر */
+.tasks-header,
+.points-header,
+.clock-header,
+.leaderboard-header,
+.courses-header,
+.awards-header {
+  padding: 10px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.tasks-title,
+.points-title,
+.clock-title,
+.leaderboard-title,
+.courses-title,
+.awards-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* محتوى الأقسام - مساحات داخلية أصغر */
+.tasks-content,
+.points-content,
+.clock-content,
+.leaderboard-content,
+.courses-content,
+.awards-content {
+  padding: 12px;
+}
+
+/* View All Button - أصغر */
+.view-all-btn {
+  background-color: var(--primary-red);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  text-align: center;
+  margin-top: auto;
+}
+
+.view-all-btn:hover {
+  background-color: #ff7875;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tasks-section,
+  .your-points-section,
+  .clock-section,
+  .leaderboard-section,
+  .courses-section,
+  .awards-section {
+    grid-column: 1;
+  }
+  
+  .tasks-section {
+    grid-row: 1;
+  }
+  
+  .clock-section {
+    grid-row: 2;
+  }
+  
+  .your-points-section {
+    grid-row: 3;
+  }
+  
+  .leaderboard-section {
+    grid-row: 4;
+  }
+  
+  .courses-section {
+    grid-row: 5;
+  }
+  
+  .awards-section {
+    grid-row: 6;
+  }
+}
+
+/* إصلاح حجم الـ Clock بشكل نهائي */
+.clock-section {
+  height: 245px !important;
+  max-height: 245px !important;
+  min-height: 245px !important;
+  overflow: hidden;
+}
+.dashboard-grid-item {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  display: block; /* يمنع التمدد */
+  height: fit-content !important;
+}
+.dashboard-grid-item {
+  height: auto !important;
+  min-height: unset !important;
+  max-height: unset !important;
+}
+.clock-section {
+  height: fit-content !important;
+  min-height: 245px;
+  max-height: 245px;
+}

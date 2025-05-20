@@ -1,0 +1,78 @@
+.Dashboard-clock-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 245px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.clock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.clock-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.current-time {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.clock-details {
+  background-color: #ffcccc;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.clock-button {
+  background-color: #ff0000;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 10px;
+}
+
+.clock-button.clocked-in {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.arrow {
+  font-size: 20px;
+}
+
+.right-arrow {
+  margin-left: 10px;
+}
+
+.left-arrow {
+  margin-right: 10px;
+  transform: rotate(180deg);
+}
