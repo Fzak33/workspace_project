@@ -19,6 +19,7 @@ export class Employee {
     viewAttendance = {},
     role = '',
     gender = '',
+    images=''
   } = {}) {
     this._id = _id;
     this.name = name;
@@ -35,6 +36,7 @@ export class Employee {
     this.viewAttendance = new ViewAttendance(viewAttendance);
     this.role = role;
     this.gender = gender;
+    this.images=images;
   }
 
   static fromJson(json) {
@@ -58,6 +60,7 @@ export class Employee {
       viewAttendance: this.viewAttendance.toJson(),
       role: this.role,
       gender: this.gender,
+      images:this.images
     };
   }
 

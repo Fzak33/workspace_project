@@ -37,7 +37,7 @@ function Profile() {
       const response = await fetch('http://localhost:3000/employee/add-image', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          "x-auth-token": token,
         },
         body: formData,
       });
@@ -46,7 +46,7 @@ function Profile() {
       if (response.ok) {
         setUploadMessage('✅ Image uploaded successfully!');
       } else {
-        setUploadMessage('❌ Failed to upload image.');
+        setUploadMessage(response.arrayBuffer.toString());
       }
     } catch (err) {
       console.error('❌ Upload failed:', err);
@@ -61,7 +61,7 @@ function Profile() {
         <div className="profile-card">
           <div className="profile-image">
             <img
-              src={previewURL || 'https://via.placeholder.com/150'}
+             src={employee?.images ? `http://localhost:3000/${employee.images}` : 'https://via.placeholder.com/40'}
               alt="Profile"
               className="image-preview"
             />
