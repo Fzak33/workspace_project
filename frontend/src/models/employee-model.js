@@ -1,6 +1,7 @@
 // models/Employee.js
 import { LeaveRequest } from './leave-request-model';
 import { ViewAttendance } from './view-attendence';
+import { TaskModel } from './task-model';
 
 export class Employee {
   constructor({
@@ -17,6 +18,7 @@ export class Employee {
     status = 0,
     leaveRequest = {},
     viewAttendance = {},
+    taskModel = [],
     role = '',
     gender = '',
     images=''
@@ -34,6 +36,7 @@ export class Employee {
     this.status = this.convertStatus(status); // ✅ تحويل الحالة لنص قابل للعرض
     this.leaveRequest = new LeaveRequest(leaveRequest);
     this.viewAttendance = new ViewAttendance(viewAttendance);
+    this.taskModel = (taskModel || []).map((task) => TaskModel.fromJson(task));
     this.role = role;
     this.gender = gender;
     this.images=images;
@@ -58,6 +61,7 @@ export class Employee {
       status: this.status,
       leaveRequest: this.leaveRequest.toJson(),
       viewAttendance: this.viewAttendance.toJson(),
+      taskModel: this.taskModel.map((task) => task.toJson()),
       role: this.role,
       gender: this.gender,
       images:this.images
@@ -86,13 +90,19 @@ export class Employee {
   }
 
   // ✅ دالة لحساب العمر
-  getAge() {
-    const today = new Date();
-    let age = today.getFullYear() - this.dateOfBirth.getFullYear();
-    const m = today.getMonth() - this.dateOfBirth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < this.dateOfBirth.getDate())) {
-      age--;
-    }
-    return age;
+getAge() {
+  const birthDate = new Date(this.dateOfBirth);
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
   }
+
+  return age;
+}
+
 }
