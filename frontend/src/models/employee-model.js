@@ -21,6 +21,7 @@ export class Employee {
     taskModel = [],
     role = '',
     gender = '',
+    images=''
   } = {}) {
     this._id = _id;
     this.name = name;
@@ -38,6 +39,7 @@ export class Employee {
     this.taskModel = (taskModel || []).map((task) => TaskModel.fromJson(task));
     this.role = role;
     this.gender = gender;
+    this.images=images;
   }
 
   static fromJson(json) {
@@ -62,6 +64,7 @@ export class Employee {
       taskModel: this.taskModel.map((task) => task.toJson()),
       role: this.role,
       gender: this.gender,
+      images:this.images
     };
   }
 
