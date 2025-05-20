@@ -13,6 +13,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import TimeOff from './components/TimeOff';
 import ManageDepartment from './components/ManageDepartment';
 import Finance from './components/Finance';
+import Profile from './components/Profile';
+
 
 function App() {
   const [activePage, setActivePage] = useState('Dashboard');
@@ -75,6 +77,19 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+             path="profile"
+           element={
+            <ProtectedRoute>
+            <Profile />
+                 </ProtectedRoute>
+  }
+/>
+
+
+
+
+
         </Routes>
       </div>
     </div>

@@ -4,6 +4,10 @@ import './Login.css';
 import logo from "./assets/login.png";
 import rightImage from "./assets/back.png"; 
 
+import { Employee } from './models/employee-model'; // ✅ تأكد أن المسار صحيح
+
+
+
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -22,19 +26,26 @@ function Login() {
       });
 
       const data = await response.json();
+      console.log('🔍 Data from backend:', data);
+
 
       if (response.ok && data.role) {
-        localStorage.setItem('role', data.role);
-        localStorage.setItem('token', data.token);
+  localStorage.setItem('role', data.role);
+  localStorage.setItem('token', data.token);
 
-        if (data.role === 'hr manager') {
-          navigate('/hr/dashboard');
-        } else if (data.role === 'employee') {
-          navigate('/employee');
-        } else {
-          setErrorMsg('Invalid role.');
-        }
-      } else {
+  // 🟢 NEW: حفظ بيانات الموظف
+  const employee = Employee.fromJson(data);
+  localStorage.setItem('employee', JSON.stringify(employee.toJson()));
+
+  if (data.role === 'hr manager') {
+    navigate('/hr/dashboard');
+  } else if (data.role === 'employee') {
+    navigate('/employee');
+  } else {
+    setErrorMsg('Invalid role.');
+  }
+}
+ else {
         setErrorMsg(data.message || 'Invalid credentials.');
       }
     } catch (err) {
